@@ -1,0 +1,294 @@
+Diencephalon -
+Diencephalon - Anterior group of the posterior tubercular vmat2 neurons
+Diencephalon - Anterior preoptic dopaminergic cluster
+Diencephalon - Anterior pretectum cluster of vmat2 Neurons
+Diencephalon - Caudal Hypothalamus
+Diencephalon - Diffuse Nucleus of the Intermediate Hypothalamus
+Diencephalon - Dopaminergic Cluster 1 - ventral thalamic and periventricular posterior tubercular DA neurons
+Diencephalon - Dopaminergic Cluster 2 - posterior tuberculum
+Diencephalon - Dopaminergic Cluster 3 - hypothalamus
+Diencephalon - Dopaminergic Cluster 4/5 - posterior tuberculum and hypothalamus
+Diencephalon - Dopaminergic Cluster 6 - hypothalamus
+Diencephalon - Dopaminergic Cluster 7 - Caudal Hypothalamus
+Diencephalon - Dorsal Thalamus
+Diencephalon - Eminentia Thalami
+Diencephalon - Habenula
+Diencephalon - Hypothalamus - Caudal Hypothalamus Neural Cluster
+Diencephalon - Hypothalamus - Intermediate Hypothalamus Neural Cluster
+Diencephalon - Hypothalamus 6.7FRhcrtR-Gal4 cluster 1
+Diencephalon - Hypothalamus 6.7FRhcrtR-Gal4 cluster 2
+Diencephalon - Hypothalamus Gad1b Cluster 1
+Diencephalon - Hypothalamus Gad1b Cluster 2
+Diencephalon - Hypothalamus Gad1b Cluster 3 Sparse
+Diencephalon - Hypothalamus Hcrt Neurons
+Diencephalon - Hypothalamus Olig2 cluster
+Diencephalon - Hypothalamus Olig2 cluster 2
+Diencephalon - Hypothalamus Qrfp neuron cluster
+Diencephalon - Hypothalamus Vglut2 Cluster 1
+Diencephalon - Hypothalamus Vglut2 Cluster 2
+Diencephalon - Hypothalamus Vglut2 Cluster 3
+Diencephalon - Hypothalamus Vglut2 Cluster 4
+Diencephalon - Hypothalamus Vglut2 Cluster 5
+Diencephalon - Hypothalamus Vglut2 Cluster 6
+Diencephalon - Hypothalamus s1181t Cluster
+Diencephalon - Hypothamic VentroLateral VMAT cluster
+Diencephalon - Intermediate Hypothalamus
+Diencephalon - Isl1 cluster 1
+Diencephalon - Isl1 cluster 2
+Diencephalon - Isl1 cluster 3
+Diencephalon - Left Habenula Vglut2 Cluster
+Diencephalon - Medial vglut2 cluster
+Diencephalon - Migrated Area of the Pretectum (M1)
+Diencephalon - Migrated Posterior Tubercular Area (M2)
+Diencephalon - Olig2 Band
+Diencephalon - Olig2 Band 2
+Diencephalon - Optic Chiasm
+Diencephalon - Otpb Cluster 1
+Diencephalon - Otpb Cluster 2 
+Diencephalon - Otpb Cluster 3
+Diencephalon - Otpb Cluster 4
+Diencephalon - Oxtl Cluster 1 in Preoptic Area
+Diencephalon - Oxtl Cluster 2
+Diencephalon - Oxtl Cluster 3
+Diencephalon - Oxtl Cluster 4 - sparse in hypothalamus
+Diencephalon - Oxtl Cluster 5
+Diencephalon - Pineal
+Diencephalon - Pineal Vmat2 cluster 
+Diencephalon - Pituitary
+Diencephalon - Posterior Tuberculum
+Diencephalon - Postoptic Commissure
+Diencephalon - Preoptic Area
+Diencephalon - Preoptic Otpb Cluster
+Diencephalon - Preoptic area Vglut2 cluster
+Diencephalon - Preoptic area posterior dopaminergic cluster
+Diencephalon - Pretectal Gad1b Cluster
+Diencephalon - Pretectal dopaminergic cluster
+Diencephalon - Pretectum
+Diencephalon - Retinal Arborization Field 1 (AF1, Approximate Location)
+Diencephalon - Retinal Arborization Field 2 (AF2, Approximate Location)
+Diencephalon - Retinal Arborization Field 3 (AF3)
+Diencephalon - Retinal Arborization Field 4 (AF4)
+Diencephalon - Retinal Arborization Field 5 (AF5)
+Diencephalon - Retinal Arborization Field 6 (AF6)
+Diencephalon - Right Habenula Vglut2 Cluster
+Diencephalon - Rostral Hypothalamus
+Diencephalon - Torus Lateralis
+Diencephalon - Ventral Thalamus
+Ganglia - Anterior Lateral Line Ganglion
+Ganglia - Eyes
+Ganglia - Facial Sensory Ganglion
+Ganglia - Facial glossopharyngeal ganglion
+Ganglia - Lateral Line Neuromast D1
+Ganglia - Lateral Line Neuromast D2
+Ganglia - Lateral Line Neuromast N
+Ganglia - Lateral Line Neuromast O1
+Ganglia - Lateral Line Neuromast OC1
+Ganglia - Lateral Line Neuromast SO1
+Ganglia - Lateral Line Neuromast SO2
+Ganglia - Lateral Line Neuromast SO3
+Ganglia - Olfactory Epithelium
+Ganglia - Posterior Lateral Line Ganglia
+Ganglia - Statoacoustic Ganglion
+Ganglia - Trigeminal Ganglion
+Ganglia - Vagal Ganglia
+Mesencephalon -
+Mesencephalon - Isl1 cluster of the mesencephalic region
+Mesencephalon - Medial Tectal Band
+Mesencephalon - NucMLF (nucleus of the medial longitudinal fascicle)
+Mesencephalon - Oculomotor Nucleus nIII
+Mesencephalon - Otpb Cluster
+Mesencephalon - Oxtl Cluster Sparse
+Mesencephalon - Ptf1a Cluster
+Mesencephalon - Retinal Arborization Field 7 (AF7)
+Mesencephalon - Retinal Arborization Field 8 (AF8)
+Mesencephalon - Retinal Arborization Field 9 (AF9)
+Mesencephalon - Sparse 6.7FRhcrtR cluster
+Mesencephalon - Tectum Stratum Periventriculare
+Mesencephalon - Tectum Neuropil
+Mesencephalon - Tegmentum
+Mesencephalon - Torus Longitudinalis
+Mesencephalon - Torus Semicircularis
+Mesencephalon - Vglut2 cluster 1
+Mesencephalon - Vmat2 cluster of paraventricular organ
+Mesencephalon - Vmat2 cluster2
+Rhombencephalon -
+Rhombencephalon - 6.7FDhcrtR-Gal4 Cluster 1
+Rhombencephalon - 6.7FDhcrtR-Gal4 Cluster 2 Sparse
+Rhombencephalon - 6.7FDhcrtR-Gal4 Cluster 3
+Rhombencephalon - 6.7FDhcrtR-Gal4 Cluster 4
+Rhombencephalon - 6.7FDhcrtR-Gal4 Cluster 5
+Rhombencephalon - 6.7FDhcrtR-Gal4 Stripe 1
+Rhombencephalon - 6.7FDhcrtR-Gal4 Stripe 2
+Rhombencephalon - 6.7FDhcrtR-Gal4 Stripe 3
+Rhombencephalon - 6.7FDhcrtR-Gal4 Stripe 4
+Rhombencephalon - Anterior Cluster of nV Trigeminal Motorneurons
+Rhombencephalon - Area Postrema
+Rhombencephalon - CaD
+Rhombencephalon - CaV
+Rhombencephalon - Caudal Ventral Cluster Labelled by Spinal Backfills
+Rhombencephalon - Cerebellar Neuropil 1
+Rhombencephalon - Cerebelluar-Vglut2 enriched areas
+Rhombencephalon - Cerebellum
+Rhombencephalon - Cerebellum Gad1b Enriched Areas
+Rhombencephalon - Corpus Cerebelli
+Rhombencephalon - Eminentia Granularis
+Rhombencephalon - Gad1b Cluster 1
+Rhombencephalon - Gad1b Cluster 10
+Rhombencephalon - Gad1b Cluster 11
+Rhombencephalon - Gad1b Cluster 12
+Rhombencephalon - Gad1b Cluster 13
+Rhombencephalon - Gad1b Cluster 14
+Rhombencephalon - Gad1b Cluster 15
+Rhombencephalon - Gad1b Cluster 16
+Rhombencephalon - Gad1b Cluster 17
+Rhombencephalon - Gad1b Cluster 18
+Rhombencephalon - Gad1b Cluster 19
+Rhombencephalon - Gad1b Cluster 2
+Rhombencephalon - Gad1b Cluster 20
+Rhombencephalon - Gad1b Cluster 3
+Rhombencephalon - Gad1b Cluster 4
+Rhombencephalon - Gad1b Cluster 5
+Rhombencephalon - Gad1b Cluster 6
+Rhombencephalon - Gad1b Cluster 7
+Rhombencephalon - Gad1b Cluster 8
+Rhombencephalon - Gad1b Cluster 9
+Rhombencephalon - Gad1b Stripe 1
+Rhombencephalon - Gad1b Stripe 2
+Rhombencephalon - Gad1b Stripe 3
+Rhombencephalon - Glyt2 Cluster 1
+Rhombencephalon - Glyt2 Cluster 10
+Rhombencephalon - Glyt2 Cluster 11
+Rhombencephalon - Glyt2 Cluster 12
+Rhombencephalon - Glyt2 Cluster 13
+Rhombencephalon - Glyt2 Cluster 14
+Rhombencephalon - Glyt2 Cluster 2
+Rhombencephalon - Glyt2 Cluster 3
+Rhombencephalon - Glyt2 Cluster 4
+Rhombencephalon - Glyt2 Cluster 5
+Rhombencephalon - Glyt2 Cluster 6
+Rhombencephalon - Glyt2 Cluster 7
+Rhombencephalon - Glyt2 Cluster 8
+Rhombencephalon - Glyt2 Cluster 9
+Rhombencephalon - Glyt2 Stripe 1
+Rhombencephalon - Glyt2 Stripe 2
+Rhombencephalon - Glyt2 Stripe 3
+Rhombencephalon - Inferior Olive
+Rhombencephalon - Interpeduncular Nucleus
+Rhombencephalon - Isl1 Cluster 1
+Rhombencephalon - Isl1 Cluster 2
+Rhombencephalon - Isl1 Cluster 3
+Rhombencephalon - Isl1 Stripe 1
+Rhombencephalon - Lateral Reticular Nucleus
+Rhombencephalon - Lobus caudalis cerebelli
+Rhombencephalon - Locus Coreuleus
+Rhombencephalon - Mauthner
+Rhombencephalon - Mauthner Cell Axon Cap
+Rhombencephalon - Medial Vestibular Nucleus
+Rhombencephalon - MiD2
+Rhombencephalon - MiD3
+Rhombencephalon - MiM1
+Rhombencephalon - MiR1
+Rhombencephalon - MiR2
+Rhombencephalon - MiT
+Rhombencephalon - MiV1
+Rhombencephalon - MiV2
+Rhombencephalon - Neuropil Region 2
+Rhombencephalon - Neuropil Region 3
+Rhombencephalon - Neuropil Region 4
+Rhombencephalon - Neuropil Region 5
+Rhombencephalon - Neuropil Region 6
+Rhombencephalon - Noradrendergic neurons of the Interfascicular and Vagal areas
+Rhombencephalon - Oculomotor Nucleus nIV
+Rhombencephalon - Olig2 Cluster
+Rhombencephalon - Olig2 Stripe
+Rhombencephalon - Olig2 enriched areas in cerebellum
+Rhombencephalon - Otpb Cluster 1
+Rhombencephalon - Otpb Cluster 2 - locus coeruleus
+Rhombencephalon - Otpb Cluster 3
+Rhombencephalon - Otpb Cluster 4
+Rhombencephalon - Otpb Cluster 5
+Rhombencephalon - Otpb Cluster 6
+Rhombencephalon - Oxtl Cluster 1 Sparse
+Rhombencephalon - Oxtl Cluster 2 Near MC axon cap
+Rhombencephalon - Posterior Cluster of nV Trigeminal Motorneurons
+Rhombencephalon - Ptf1a Cluster 1
+Rhombencephalon - Ptf1a Stripe
+Rhombencephalon - Qrfp neuron cluster sparse
+Rhombencephalon - Raphe - Inferior
+Rhombencephalon - Raphe - Superior
+Rhombencephalon - Rhombomere 1
+Rhombencephalon - Rhombomere 2
+Rhombencephalon - Rhombomere 3
+Rhombencephalon - Rhombomere 4
+Rhombencephalon - Rhombomere 5
+Rhombencephalon - Rhombomere 6
+Rhombencephalon - Rhombomere 7
+Rhombencephalon - RoL-R1
+Rhombencephalon - RoL2
+Rhombencephalon - RoL3
+Rhombencephalon - RoM1
+Rhombencephalon - RoM2
+Rhombencephalon - RoM3
+Rhombencephalon - RoV3
+Rhombencephalon - S1181t Cluster
+Rhombencephalon - Small cluster of TH stained neurons
+Rhombencephalon - Spinal Backfill Vestibular Population
+Rhombencephalon - Spiral Fiber Neuron Anterior cluster
+Rhombencephalon - Spiral Fiber Neuron Posterior cluster
+Rhombencephalon - Tangential Vestibular Nucleus
+Rhombencephalon - VII Facial Motor and octavolateralis efferent neurons
+Rhombencephalon - VII' Facial Motor and octavolateralis efferent neurons
+Rhombencephalon - Valvula Cerebelli
+Rhombencephalon - Ventrolateral population of serotonergic neurons
+Rhombencephalon - Vglut2 Stripe 1
+Rhombencephalon - Vglut2 Stripe 2
+Rhombencephalon - Vglut2 Stripe 3
+Rhombencephalon - Vglut2 Stripe 4
+Rhombencephalon - Vglut2 cluster 1
+Rhombencephalon - Vglut2 cluster 2
+Rhombencephalon - Vglut2 cluster 3
+Rhombencephalon - Vglut2 cluster 4
+Rhombencephalon - Vmat2 Cluster 1
+Rhombencephalon - Vmat2 Cluster 2
+Rhombencephalon - Vmat2 Cluster 3
+Rhombencephalon - Vmat2 Cluster 4
+Rhombencephalon - Vmat2 Cluster 5
+Rhombencephalon - Vmat2 Stripe1
+Rhombencephalon - Vmat2 Stripe2
+Rhombencephalon - Vmat2 Stripe3
+Rhombencephalon - X Vagus motorneuron cluster
+Spinal Cord
+Spinal Cord - 6.7FDhcrtR-Gal4 Stripe
+Spinal Cord - Dorsal Sparse Isl1 cluster
+Spinal Cord - Gad1b Stripe 1
+Spinal Cord - Gad1b Stripe 2
+Spinal Cord - Glyt2 Stripe
+Spinal Cord - Isl1 stripe - motorneurons
+Spinal Cord - Neurons with descending projections labelled by spinal backfills
+Spinal Cord - Neuropil Region
+Spinal Cord - Olig2 Stripe
+Spinal Cord - Vglut2 Stripe 1
+Spinal Cord - Vglut2 Stripe 2
+Spinal Cord - Vglut2 Stripe 3
+Spinal Cord - Vmat2 Stripe1
+Spinal Cord - Vmat2 Stripe2
+Telencephalon -
+Telencephalon - Anterior Commisure
+Telencephalon - Isl1 cluster 1
+Telencephalon - Isl1 cluster 2
+Telencephalon - Olfactory Bulb
+Telencephalon - Olfactory bulb dopaminergic neuron areas
+Telencephalon - Olig2 Cluster
+Telencephalon - Optic Commissure
+Telencephalon - Pallium
+Telencephalon - Postoptic Commissure
+Telencephalon - S1181t Cluster
+Telencephalon - Subpallial Gad1b cluster
+Telencephalon - Subpallial Otpb Cluster 2
+Telencephalon - Subpallial Otpb strip
+Telencephalon - Subpallial Vglut2 Cluster
+Telencephalon - Subpallial dopaminergic cluster
+Telencephalon - Subpallium
+Telencephalon - Telencephalic Migrated Area 4 (M4)
+Telencephalon - Vglut2 rind
+Telencephalon - Vmat2 cluster

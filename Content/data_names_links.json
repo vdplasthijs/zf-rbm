@@ -1,0 +1,85 @@
+{
+  "df": [
+    "df/f",
+    "dff",
+    "calcium",
+    "values",
+    "calcium_data",
+    "df"
+  ],
+  "layerlags": [
+    "layerlags",
+    "timedelays",
+    "delays"
+  ],
+  "df_aligned": [
+    "df_aligned"
+  ],
+  "coords": [
+    "coordinates",
+    "coords",
+    "coordinates_raw"
+  ],
+  "ref_coords": [
+    "refcoords",
+    "ref_coords",
+    "refcoordinates",
+    "ref_coordinates",
+    "reference_coordinates",
+    "coordinates_registered"
+  ],
+  "zbrain_coords": [
+    "zbraincoords",
+    "zbrain_coords",
+    "zbrain_coordinates",
+    "zbraincoordinates"
+  ],
+  "behavior": [
+    "behavior",
+    "behav"
+  ],
+  "stimulus": [
+    "stimulus",
+    "stim",
+    "stimuli",
+    "stimulus_trace",
+    "tiltangle"
+  ],
+  "times": [
+    "times",
+    "time",
+    "time_vector"
+  ],
+  "spikes": [
+    "spike",
+    "spikes",
+    "spike_data",
+    "thresholdedspikes"
+  ],
+  "labels": [
+    "labels",
+    "region_labels",
+    "zbrainatlas_labels"
+  ],
+  "not_neuropil": [
+    "not_neuropil",
+    "no_neuropil"
+  ],
+  "phase_map": [
+    "phasemapneuron",
+    "phase_map"
+  ],
+  "neuropil": [
+    "neuropil",
+    "neuropil_neurons"
+  ],
+  "sampling_rate": [
+    "sr",
+    "sampling_rate"
+  ],
+  "structural_data": [
+    "structural_data",
+    "raw_data",
+    "images"
+  ]
+}

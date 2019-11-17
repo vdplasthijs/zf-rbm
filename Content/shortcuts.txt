@@ -1,0 +1,28 @@
+Ctrl + P: Play
+Ctrl + -: Unbounded
+Ctrl + S: Select cell in the middle of the view
+Ctrl + G: Select cell by neuron id
+Ctrl + E: Export currently visible cells (number & data)
+Ctrl + F: step one frame forward
+Ctrl + B: step one frame backward
+Ctrl + J: Pan left
+Ctrl + L: Pan right
+Ctrl + I: Pan front
+Ctrl + M: Pan back
+Ctrl + K: Center view
+Ctrl + T: Toggle between current and last dataset
+Ctrl + R: Toggle rotation during animation
+Ctrl + Y: Toggle plotting calcium fit
+Ctrl + N: Toggle neuropil plot
+Ctrl + 1: Switch to limit the x-axis extent
+Ctrl + 2: Switch to limit the y-axis extent
+Ctrl + 3: Switch to limit the z-axis extent
+Ctrl + Alt + 1: View y-z-projection
+Ctrl + Alt + 2: View x-z-projection
+Ctrl + Alt + 3: View x-y-projection
+Ctrl + A: Add a static dataset
+Shift + Click: Select a cell for display (white)
+Alt + Click : Select another cell for display (red)
+Ctrl + Alt + C: Start embedded kernel
+Ctrl + Alt + V: Start / Stop video exporting
+Ctrl + Alt + G: Draw region of selected neuron
