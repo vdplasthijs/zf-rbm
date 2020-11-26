@@ -21,16 +21,39 @@ import sys,os
 import importlib
 import seaborn as sns
 import pandas as pd
+import scipy.stats
 
+from cycler import cycler
+## Create list with standard colors:
+color_dict_stand = {}
+for ii, x in enumerate(plt.rcParams['axes.prop_cycle']()):
+    color_dict_stand[ii] = x['color']
+    if ii > 8:
+        break  # after 8 it repeats (for ever)
+plt.rcParams['axes.prop_cycle'] = cycler(color=sns.color_palette('colorblind'))
+
+
+dr_legend = {'pca': 'PCA', 'rbm': 'RBM', 'fa': 'FA', 'ica': 'ICA', 'glm': 'GLM'}
+dr_colors = {'glm': '#008B8B', 'pca': '#808000', 'rbm': '#800080', 'fa': 'red', 'ica':'#157bf9'}
+
+def set_fontsize(font_size=12):
+    plt.rcParams['font.size'] = font_size
+    plt.rcParams['axes.autolimit_mode'] = 'data' # default: 'data'
+    params = {'legend.fontsize': font_size,
+             'axes.labelsize': font_size,
+             'axes.titlesize': font_size,
+             'xtick.labelsize': font_size,
+             'ytick.labelsize': font_size}
+    plt.rcParams.update(params)
 
 def plot_example_hu(ax=None, hu_screenshot_folder='/home/thijs/repos/zf-rbm/figures/HU_screenshots_2020-05-16-0844',
                     hu_id=86, filename_prefix='screenshot_hu_', y_min=400, y_max=1600, fontsize=10):
     '''fontsize: 15 for (10, 10) fig, linearly scaling seems fine '''
-                    
+
     # screenshot_files = os.listdir(hu_screenshot_folder)
     filename = filename_prefix + str(hu_id).zfill(3) + '.png'
     image = mpimg.imread(os.path.join(hu_screenshot_folder, filename))
-    
+
     if ax is None:
         ax = plt.subplot(111)
     ax.imshow(image[:, y_min:y_max, :])
@@ -39,73 +62,73 @@ def plot_example_hu(ax=None, hu_screenshot_folder='/home/thijs/repos/zf-rbm/figu
     ax.text(s='C', x=145, y=71, c='white', fontdict={'size': fontsize})
     ax.text(s='R', x=95, y=1, c='white', fontdict={'size': fontsize, 'va': 'top'})
     ax.text(s='L', x=95, y=124, c='white', fontdict={'size': fontsize})
-    
+
     ax.text(s='Ro', x=25, y=571, c='white', fontdict={'size': fontsize})
     ax.text(s='C', x=145, y=571, c='white', fontdict={'size': fontsize})
     ax.text(s='D', x=95, y=501, c='white', fontdict={'size': fontsize, 'va': 'top'})
     ax.text(s='V', x=95, y=624, c='white', fontdict={'size': fontsize})
     ax.text(s='0.1 mm', x=1000, y=840, c='white', fontdict={'size': fontsize})
-    
-    ax.set_title(f'HU {hu_id}')
+
+    ax.set_title(f'Hidden unit {hu_id}', fontdict={'weight': 'bold'})
     ax.axis('off')
-    
+
     return ax
-    
+
 def break_word(word, break_size=25):
     '''Function that tries to  break up word at first space after given break_size'''
     if len(word) > break_size:
         for ii in range(break_size, len(word)):
             if word[ii] == ' ': # first space encountered
-                word = word[:ii] + '\n' + word[ii:]  #insert break 
-                break 
+                word = word[:ii] + '\n' + word[ii:]  #insert break
+                break
     return word
-                
+
 def plot_info_hu(raster_order, hu_activity, RBM, rec, selection_neurons,
                  mu=82, n_regions=8, abs_th=0.05, region_absolute=True, save_fig=False):
-    '''Function to plot HU with dynamic activity and top regions 
-    
+    '''Function to plot HU with dynamic activity and top regions
+
     Parameters:
     -----------
         raster_order: np array
             array of length HU, describing the raster mapping (just for name sake)
-        hu_activity: 2D np array 
+        hu_activity: 2D np array
             activity matrix (HU x time)
-        RBM: RBM class 
-            RBM to use 
-        rec: zecording object 
-            data set to use 
-        selectoin_neurons: np array 
+        RBM: RBM class
+            RBM to use
+        rec: zecording object
+            data set to use
+        selectoin_neurons: np array
             array of indices neurons to use (of rec )
-        mu: int 
+        mu: int
             current HU index
-        n_regions: int 
-            how many regions to plot 
-        abs_th: float 
+        n_regions: int
+            how many regions to plot
+        abs_th: float
             threshold for absolute weights (to count in reigon)
         region_absolute: bool
-            if True, sort by absolute number of neurons, if False, by relative 
+            if True, sort by absolute number of neurons, if False, by relative
         save_fig: bool
-            whether to save 
-            
+            whether to save
+
     Returns:
     -----------
-        fig: fig handle 
+        fig: fig handle
     '''
     # plt.rcParams['figure.figsize'] = (10, 5)
-    
+
     fig = plt.figure(constrained_layout=False)
-    gs_im = fig.add_gridspec(ncols=1, nrows=1, bottom=0.3, top=0.95, 
+    gs_im = fig.add_gridspec(ncols=1, nrows=1, bottom=0.3, top=0.95,
                              hspace=0, wspace=0, left=0.05, right=0.5)  # [1, 2.2, 1.2]
     gs_regions = fig.add_gridspec(ncols=1, nrows=1, bottom=0.3, top=0.95,
                                  hspace=0, wspace=0, left=0.85, right=0.95)
-    gs_trace = fig.add_gridspec(ncols=1, nrows=1, bottom=0.05, top=0.18, 
+    gs_trace = fig.add_gridspec(ncols=1, nrows=1, bottom=0.05, top=0.18,
                                 hspace=0, left=0.05, right=0.95)
 
     freq = 1 / np.mean(np.diff(rec.time))
-    raster_order_reverse = np.zeros_like(raster_order)  # reverse order to find corresponding names 
+    raster_order_reverse = np.zeros_like(raster_order)  # reverse order to find corresponding names
     for i_map, map in enumerate(raster_order):
         raster_order_reverse[map] = i_map
-    
+
     ## plot screenshot
     ax_im = fig.add_subplot(gs_im[0, 0])
     plot_example_hu(fontsize=7.5, ax=ax_im, hu_id=mu)
@@ -115,7 +138,7 @@ def plot_info_hu(raster_order, hu_activity, RBM, rec, selection_neurons,
     ## plot time trace
     ax_trace = fig.add_subplot(gs_trace[0, 0])
     ax_trace.plot(hu_activity[mu, :], c='k', lw=2)
-    ax_trace.set_xticks([x * int(60 * freq) for x in range(9)])  # set time in seconds 
+    ax_trace.set_xticks([x * int(60 * freq) for x in range(9)])  # set time in seconds
     ax_trace.set_xticklabels((np.round(ax_trace.get_xticks() / freq)).astype('int'))
     ax_trace.set_xlabel('Time (s)'); ax_trace.set_ylabel('Activity (a.u.)')
     ax_trace.spines['top'].set_visible(False)
@@ -124,27 +147,27 @@ def plot_info_hu(raster_order, hu_activity, RBM, rec, selection_neurons,
     ## plot region occupancy
     hu_weights = RBM.weights[mu, :]
     vu_labels = rec.labels[selection_neurons, :]
-    vu_selection = np.abs(hu_weights) >= abs_th  # VUs with weights absolute value geq threshold 
-    vu_selection_labels = vu_labels[vu_selection, :]  # their label 
-    n_vu_per_region_total = np.squeeze(np.array(vu_labels.sum(0)))  # total number of neurons per region 
-    n_vu_per_region = np.squeeze(np.array(vu_selection_labels.sum(0)))  # number of these neurons per region 
+    vu_selection = np.abs(hu_weights) >= abs_th  # VUs with weights absolute value geq threshold
+    vu_selection_labels = vu_labels[vu_selection, :]  # their label
+    n_vu_per_region_total = np.squeeze(np.array(vu_labels.sum(0)))  # total number of neurons per region
+    n_vu_per_region = np.squeeze(np.array(vu_selection_labels.sum(0)))  # number of these neurons per region
 
     nz_ind = np.where(n_vu_per_region_total)
-    divided_arr = np.zeros_like(n_vu_per_region) + np.nan 
-    divided_arr[nz_ind] = n_vu_per_region[nz_ind] / n_vu_per_region_total[nz_ind]  # divide without zeroes 
-    inds_sorted_div = np.argsort(divided_arr)[::-1] # nan to large to small 
+    divided_arr = np.zeros_like(n_vu_per_region) + np.nan
+    divided_arr[nz_ind] = n_vu_per_region[nz_ind] / n_vu_per_region_total[nz_ind]  # divide without zeroes
+    inds_sorted_div = np.argsort(divided_arr)[::-1] # nan to large to small
     if region_absolute:
-        top_region_labels = np.argsort(n_vu_per_region)[::-1]  # sort by top absolute number 
+        top_region_labels = np.argsort(n_vu_per_region)[::-1]  # sort by top absolute number
     else:
-        top_region_labels = inds_sorted_div[np.logical_not(np.isnan(divided_arr[inds_sorted_div]))]  # sort by relative & remove nans 
+        top_region_labels = inds_sorted_div[np.logical_not(np.isnan(divided_arr[inds_sorted_div]))]  # sort by relative & remove nans
     height_bars = divided_arr[top_region_labels[:n_regions]]
     height_bars_abs = n_vu_per_region[top_region_labels[:n_regions]]
     with open('/home/thijs/repos/fishualizer/Content/RegionLabels.txt', 'r') as f:
         all_names = f.readlines()
     labelnames = np.array([x.strip().rstrip('-') for x in all_names])
-    
+
     ax_regions = fig.add_subplot(gs_regions[0, 0])
-    ax_regions_abs = ax_regions.twiny()  # create copy with shared y 
+    ax_regions_abs = ax_regions.twiny()  # create copy with shared y
     ax_regions.barh(y=np.arange(n_regions)- 0.15, color='grey',
                    width=height_bars * 100, height=0.3)  # multiply with 100 for percetnage
     ax_regions_abs.barh(y=np.arange(n_regions) + 0.15, color='m',
@@ -164,7 +187,54 @@ def plot_info_hu(raster_order, hu_activity, RBM, rec, selection_neurons,
     ax_regions.spines['right'].set_visible(False)
 
     if save_fig:
-        plt.savefig(f'/home/thijs/repos/zf-rbm/figures/HU_info_2020-05-16-0844/test_{raster_order_reverse[mu]}.pdf', 
+        plt.savefig(f'/home/thijs/repos/zf-rbm/figures/HU_info_2020-05-16-0844/test_{raster_order_reverse[mu]}.pdf',
                  dpi=500, bbox_inches='tight')
-                 
+
     return fig
+
+def plot_uniform_distr(w_mat, sh_w_mat, cdf_mat, sh_cdf_mat, k_value=0, dr='rbm',
+                       print_pval=True, ax=None, plot_legend=False):
+        if ax is None:
+            ax = plt.subplot(111)
+        dict_str_number = {0: '1st', 1: '2nd', 2: '3rd'}
+
+        cdf_plot = np.array([0] + list(cdf_mat[dr][k_value, :]))  # add 0 to start of cum pdf, also pans out with extra weight bin
+        sh_cdf_plot = np.array([0] + list(sh_cdf_mat[dr][k_value, :]))
+
+
+        ax.plot(sh_w_mat[dr][k_value, :], sh_cdf_plot, linestyle=':',
+                 label=f'{dr_legend[dr]} shuffled', linewidth=5, color='k')#dr_colors[dr]);
+        ax.plot(w_mat[dr][k_value, :], cdf_plot, color=dr_colors[dr],
+             linewidth=5, label=f'{dr_legend[dr]}');
+        ax.set_title(f'{dict_str_number[k_value]} strongest connection of {dr_legend[dr]}',
+                                       fontdict={'weight': 'bold'})
+        ax.set_xlabel('Largest weight per neuron');
+        ax.set_ylabel(f'Cumulative PDF');
+        if plot_legend:
+            ax.legend(bbox_to_anchor=(0.5, 0.5),
+                                        frameon=False);
+
+        p_val = scipy.stats.ks_2samp(cdf_plot, sh_cdf_plot)[1]
+        x_pos = np.minimum(w_mat[dr][k_value, 0], sh_w_mat[dr][k_value, 0])
+        ax.text(s=f'P = {np.round(p_val, 3)}', x=x_pos, y=0.8)
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+
+        return ax
+
+def plot_binned_stats(ax, plot_bins, mean_bins, std_bins, comp_moment=None):
+    if comp_moment is not None:
+        plot_color = mom_colors[comp_moment]
+    else:
+        plot_color = 'grey'
+    std_se = 'std'
+    inds_nn = ~np.isnan(mean_bins)
+    plot_bins, mean_bins, std_bins = plot_bins[inds_nn], mean_bins[inds_nn], std_bins[inds_nn]
+
+    ax.plot([plot_bins.min(), plot_bins.max()], [plot_bins.min(), plot_bins.max()], ':', color='k', label='y=x')
+    ax.plot(plot_bins, mean_bins, color=plot_color, label='mean')
+    ax.fill_between(plot_bins, mean_bins, mean_bins+std_bins, color=plot_color, alpha=0.3, label=std_se)
+    ax.fill_between(plot_bins, mean_bins, mean_bins-std_bins, color=plot_color, alpha=0.3)
+    ax.set_xlim([plot_bins.min(), plot_bins.max()])
+    ax.set_ylim([plot_bins.min(), plot_bins.max()])
+    return ax
