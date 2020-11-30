@@ -238,3 +238,20 @@ def plot_binned_stats(ax, plot_bins, mean_bins, std_bins, comp_moment=None):
     ax.set_xlim([plot_bins.min(), plot_bins.max()])
     ax.set_ylim([plot_bins.min(), plot_bins.max()])
     return ax
+
+def plot_reproduc_mat(dict_mat, key, ax=None):
+    if ax is None:
+        ax = plt.subplot(111)
+    data = dict_mat[key]['mat']
+    mask = np.zeros_like(data)
+    mask[np.triu_indices_from(data, k=0)] = True
+    sns.heatmap(data, annot=True, ax=ax, square=True, mask=mask, vmin=0, vmax=1,
+                cmap='pink_r', cbar_kws={'label': 'Pearson correlation'})
+    ax.set_xlabel('# Fish')
+    ax.set_ylabel('# Fish')
+    ax.set_xticks(np.arange(len(data) - 1) + 0.5)
+    ax.set_yticks(np.arange(1, len(data)) + 0.5)
+    ax.set_yticklabels([str(x + 1) for x in range(len(data))])
+    bottom, top = ax.get_ylim()
+    ax.set_ylim(bottom + 0.5, top - 0.5);
+    ax.set_title('Similarity between individual fish', fontdict={'weight': 'bold'})

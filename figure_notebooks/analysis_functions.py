@@ -194,3 +194,30 @@ def create_normalised_df(df, stats_bin, tt_stats,
 
         new_df['reconstruct'].iat[curr_entry] = df['reconstruct_med'].iat[old_df_entry]
     return new_df
+
+def load_reprod_matrix(path, swap=False):
+    with open(path, 'r') as f:
+        content = f.readlines()
+    dict_matrices = {}
+    for line in content:
+        if line[:7] == 'Method:':
+            current_meth = line[8:].rstrip()
+            current_meth = current_meth.replace('=', '')  # extract name
+            dict_matrices[current_meth] = {'run_names': [], 'raw_mat': []}
+        elif line[:3] == 'Run':
+            dict_matrices[current_meth]['run_names'].append(line[7:].rstrip())
+        else:
+            dict_matrices[current_meth]['raw_mat'].append(line.rstrip())
+    for meth in dict_matrices.keys():
+        dict_matrices[meth]['mat'] = np.zeros((len(dict_matrices[meth]['raw_mat']) - 1,
+                                               len(dict_matrices[meth]['raw_mat']) - 1))
+        for i_line, line in enumerate(dict_matrices[meth]['raw_mat']):
+            if i_line == 0:
+                continue  # skip first one because its just indices
+            list_el = line.split()
+            list_el = [float(x) for x in list_el[1:]]  # skip first becaues its an index
+            dict_matrices[meth]['mat'][i_line - 1, :] = np.array(list_el)  # -1 because of i_line > 0
+
+    if swap:
+        dict_matrices['RBM'], dict_matrices['covariance'] = dict_matrices['covariance'], dict_matrices['RBM']
+    return dict_matrices

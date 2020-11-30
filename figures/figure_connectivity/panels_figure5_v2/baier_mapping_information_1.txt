@@ -1,0 +1,124 @@
+----------------- Neurons per Region --------------------
+Region Anterior_reticular_formation_left(Not included) nNeurons:0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+Region Anterior_reticular_formation_right(Not included) nNeurons:0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+Region Caudal_hypothalamus_left(Not included) nNeurons:0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+Region Caudal_hypothalamus_right(Not included) nNeurons:0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+Region Cerebellum_left(Included) nNeurons:1653.0 1789.0 1401.0 1706.0 1309.0 897.0 848.0 
+Region Cerebellum_right(Included) nNeurons:1710.0 1672.0 1236.0 1481.0 1286.0 855.0 900.0 
+Region Glossopharyngeal_ganglion_left(Not included) nNeurons:0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+Region Glossopharyngeal_ganglion_right(Not included) nNeurons:0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+Region Habenula_left(Included) nNeurons:209.0 137.0 169.0 172.0 234.0 115.0 47.0 
+Region Habenula_right(Included) nNeurons:192.0 254.0 203.0 330.0 288.0 114.0 94.0 
+Region Inferior_olive_left(Included) nNeurons:0.0 25.0 12.0 8.0 0.0 6.0 2.0 
+Region Inferior_olive_right(Included) nNeurons:0.0 11.0 17.0 3.0 0.0 10.0 4.0 
+Region Intermediate_hypothalamus_left(Not included) nNeurons:0.0 0.0 47.0 0.0 0.0 0.0 0.0 
+Region Intermediate_hypothalamus_right(Not included) nNeurons:0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+Region Intermediate_reticular_formation_left(Included) nNeurons:186.0 583.0 892.0 302.0 140.0 217.0 198.0 
+Region Intermediate_reticular_formation_right(Included) nNeurons:138.0 489.0 848.0 329.0 175.0 236.0 276.0 
+Region Interpeduncular_nucleus_left(Not included) nNeurons:0.0 0.0 16.0 0.0 0.0 0.0 0.0 
+Region Interpeduncular_nucleus_right(Not included) nNeurons:0.0 0.0 5.0 0.0 0.0 0.0 0.0 
+Region MO_stripe_1_left(Included) nNeurons:1632.0 1808.0 1520.0 1441.0 1847.0 889.0 704.0 
+Region MO_stripe_1_right(Included) nNeurons:983.0 1149.0 1117.0 1048.0 1280.0 587.0 501.0 
+Region MO_stripe_2_left(Included) nNeurons:757.0 790.0 729.0 475.0 868.0 351.0 366.0 
+Region MO_stripe_2_right(Included) nNeurons:801.0 802.0 813.0 665.0 946.0 357.0 473.0 
+Region MO_stripe_3_left(Included) nNeurons:948.0 1113.0 937.0 836.0 837.0 504.0 420.0 
+Region MO_stripe_3_right(Included) nNeurons:856.0 987.0 860.0 798.0 832.0 534.0 407.0 
+Region MO_stripe_4_left(Included) nNeurons:817.0 1063.0 739.0 751.0 904.0 379.0 440.0 
+Region MO_stripe_4_right(Included) nNeurons:745.0 929.0 661.0 699.0 768.0 358.0 370.0 
+Region MO_stripe_5_left(Included) nNeurons:1470.0 2082.0 1326.0 1115.0 1627.0 617.0 622.0 
+Region MO_stripe_5_right(Included) nNeurons:1604.0 1849.0 1501.0 1325.0 1686.0 621.0 638.0 
+Region Medial_octavolateral_nucleus_left(Included) nNeurons:1094.0 1341.0 807.0 829.0 570.0 464.0 429.0 
+Region Medial_octavolateral_nucleus_right(Included) nNeurons:1371.0 1569.0 830.0 857.0 905.0 505.0 579.0 
+Region Octaval_ganglion_left(Not included) nNeurons:0.0 0.0 8.0 0.0 0.0 0.0 0.0 
+Region Octaval_ganglion_right(Not included) nNeurons:0.0 0.0 10.0 0.0 0.0 0.0 0.0 
+Region Olfactory_bulb_left(Included) nNeurons:0.0 88.0 7.0 10.0 8.0 0.0 5.0 
+Region Olfactory_bulb_right(Included) nNeurons:0.0 61.0 13.0 35.0 22.0 1.0 14.0 
+Region Olfactory_epithelium_left(Included) nNeurons:0.0 52.0 0.0 0.0 1.0 0.0 1.0 
+Region Olfactory_epithelium_right(Included) nNeurons:0.0 29.0 4.0 13.0 2.0 0.0 0.0 
+Region Pallium_left(Included) nNeurons:503.0 1015.0 708.0 1045.0 665.0 580.0 242.0 
+Region Pallium_right(Included) nNeurons:341.0 845.0 634.0 1083.0 656.0 543.0 401.0 
+Region Pituitary_left(Not included) nNeurons:0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+Region Pituitary_right(Not included) nNeurons:0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+Region Posterior_reticular_formation_left(Included) nNeurons:452.0 1097.0 1000.0 605.0 324.0 441.0 391.0 
+Region Posterior_reticular_formation_right(Included) nNeurons:452.0 979.0 1101.0 763.0 361.0 495.0 438.0 
+Region Posterior_tuberculum_left(Included) nNeurons:0.0 25.0 16.0 0.0 6.0 0.0 4.0 
+Region Posterior_tuberculum_right(Included) nNeurons:0.0 23.0 9.0 0.0 4.0 0.0 4.0 
+Region Preoptic_region_left(Not included) nNeurons:0.0 10.0 0.0 0.0 9.0 0.0 5.0 
+Region Preoptic_region_right(Not included) nNeurons:0.0 14.0 0.0 0.0 29.0 0.0 8.0 
+Region Pretectum_left(Included) nNeurons:907.0 1581.0 1059.0 959.0 1104.0 583.0 465.0 
+Region Pretectum_right(Included) nNeurons:875.0 1473.0 1083.0 1031.0 1109.0 613.0 523.0 
+Region Raphe_nucleus_left(Included) nNeurons:31.0 118.0 239.0 94.0 45.0 48.0 52.0 
+Region Raphe_nucleus_right(Included) nNeurons:25.0 74.0 210.0 81.0 21.0 46.0 37.0 
+Region Retina_left(Not included) nNeurons:0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+Region Retina_right(Not included) nNeurons:0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+Region Rostral_hypothalamus_left(Not included) nNeurons:0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+Region Rostral_hypothalamus_right(Not included) nNeurons:0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+Region Subpallium_left(Included) nNeurons:0.0 322.0 60.0 177.0 92.0 3.0 35.0 
+Region Subpallium_right(Included) nNeurons:0.0 328.0 84.0 200.0 153.0 7.0 51.0 
+Region Tectum_left(Included) nNeurons:6855.0 8001.0 6552.0 5745.0 5694.0 3801.0 2617.0 
+Region Tectum_right(Included) nNeurons:7306.0 9355.0 6495.0 5501.0 5940.0 3992.0 2848.0 
+Region Tegmentum_left(Included) nNeurons:494.0 1666.0 1531.0 1137.0 740.0 503.0 644.0 
+Region Tegmentum_right(Included) nNeurons:334.0 1215.0 1470.0 961.0 684.0 486.0 591.0 
+Region Thalamus_left(Included) nNeurons:365.0 1757.0 968.0 557.0 1031.0 206.0 487.0 
+Region Thalamus_right(Included) nNeurons:258.0 1530.0 769.0 550.0 1045.0 252.0 639.0 
+Region Torus_longitudinalis_left(Included) nNeurons:57.0 55.0 49.0 60.0 19.0 42.0 19.0 
+Region Torus_longitudinalis_right(Included) nNeurons:56.0 70.0 76.0 70.0 22.0 39.0 24.0 
+Region Torus_semicircularis_left(Included) nNeurons:0.0 683.0 850.0 174.0 75.0 18.0 78.0 
+Region Torus_semicircularis_right(Included) nNeurons:0.0 94.0 394.0 24.0 12.0 14.0 34.0 
+Region Trigeminal_ganglion_left(Not included) nNeurons:0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+Region Trigeminal_ganglion_right(Not included) nNeurons:0.0 0.0 0.0 0.0 0.0 0.0 0.0 
+Region Vagal_region_left(Included) nNeurons:23.0 20.0 2.0 3.0 1.0 11.0 0.0 
+Region Vagal_region_right(Included) nNeurons:61.0 27.0 20.0 0.0 12.0 14.0 19.0 
+Region Vagus_motor_neurons_left(Included) nNeurons:504.0 967.0 981.0 435.0 661.0 215.0 320.0 
+Region Vagus_motor_neurons_right(Included) nNeurons:410.0 809.0 1030.0 505.0 690.0 208.0 351.0 
+----------------- 50 Selected Regions (Nmin = 5) -------------------
+Region Cerebellum_left, <nNeurons>: 1371.86
+Region Cerebellum_right, <nNeurons>: 1305.71
+Region Habenula_left, <nNeurons>: 154.71
+Region Habenula_right, <nNeurons>: 210.71
+Region Inferior_olive_left, <nNeurons>: 7.57
+Region Inferior_olive_right, <nNeurons>: 6.43
+Region Intermediate_reticular_formation_left, <nNeurons>: 359.71
+Region Intermediate_reticular_formation_right, <nNeurons>: 355.86
+Region MO_stripe_1_left, <nNeurons>: 1405.86
+Region MO_stripe_1_right, <nNeurons>: 952.14
+Region MO_stripe_2_left, <nNeurons>: 619.43
+Region MO_stripe_2_right, <nNeurons>: 693.86
+Region MO_stripe_3_left, <nNeurons>: 799.29
+Region MO_stripe_3_right, <nNeurons>: 753.43
+Region MO_stripe_4_left, <nNeurons>: 727.57
+Region MO_stripe_4_right, <nNeurons>: 647.14
+Region MO_stripe_5_left, <nNeurons>: 1265.57
+Region MO_stripe_5_right, <nNeurons>: 1317.71
+Region Medial_octavolateral_nucleus_left, <nNeurons>: 790.57
+Region Medial_octavolateral_nucleus_right, <nNeurons>: 945.14
+Region Olfactory_bulb_left, <nNeurons>: 16.86
+Region Olfactory_bulb_right, <nNeurons>: 20.86
+Region Olfactory_epithelium_left, <nNeurons>: 7.71
+Region Olfactory_epithelium_right, <nNeurons>: 6.86
+Region Pallium_left, <nNeurons>: 679.71
+Region Pallium_right, <nNeurons>: 643.29
+Region Posterior_reticular_formation_left, <nNeurons>: 615.71
+Region Posterior_reticular_formation_right, <nNeurons>: 655.57
+Region Posterior_tuberculum_left, <nNeurons>: 7.29
+Region Posterior_tuberculum_right, <nNeurons>: 5.71
+Region Pretectum_left, <nNeurons>: 951.14
+Region Pretectum_right, <nNeurons>: 958.14
+Region Raphe_nucleus_left, <nNeurons>: 89.57
+Region Raphe_nucleus_right, <nNeurons>: 70.57
+Region Subpallium_left, <nNeurons>: 98.43
+Region Subpallium_right, <nNeurons>: 117.57
+Region Tectum_left, <nNeurons>: 5609.29
+Region Tectum_right, <nNeurons>: 5919.57
+Region Tegmentum_left, <nNeurons>: 959.29
+Region Tegmentum_right, <nNeurons>: 820.14
+Region Thalamus_left, <nNeurons>: 767.29
+Region Thalamus_right, <nNeurons>: 720.43
+Region Torus_longitudinalis_left, <nNeurons>: 43.00
+Region Torus_longitudinalis_right, <nNeurons>: 51.00
+Region Torus_semicircularis_left, <nNeurons>: 268.29
+Region Torus_semicircularis_right, <nNeurons>: 81.71
+Region Vagal_region_left, <nNeurons>: 8.57
+Region Vagal_region_right, <nNeurons>: 21.86
+Region Vagus_motor_neurons_left, <nNeurons>: 583.29
+Region Vagus_motor_neurons_right, <nNeurons>: 571.86
