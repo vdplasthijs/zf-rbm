@@ -8,6 +8,20 @@
 import numpy as np
 from tqdm import tqdm
 import pandas as pd
+import scipy.spatial, scipy.cluster
+
+def opt_leaf(w_mat, dim=0):
+    '''create optimal leaf order over dim, of matrix w_mat. if w_mat is not an
+    np.array then its assumed to be a RNN layer. see also: https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.optimal_leaf_ordering.html#scipy.cluster.hierarchy.optimal_leaf_ordering'''
+    if type(w_mat) != np.ndarray:  # assume it's an rnn layer
+        w_mat = [x for x in w_mat.parameters()][0].detach().numpy()
+    assert w_mat.ndim == 2
+    if dim == 1:  # transpose to get right dim in shape
+        w_mat = w_mat.T
+    dist = scipy.spatial.distance.pdist(w_mat, metric='euclidean')  # distanc ematrix
+    link_mat = scipy.cluster.hierarchy.ward(dist)  # linkage matrix
+    opt_leaves = scipy.cluster.hierarchy.leaves_list(scipy.cluster.hierarchy.optimal_leaf_ordering(link_mat, dist))
+    return opt_leaves
 
 def count_connections(weight_matrix, K_arr = np.arange(11),
                       perc_top= 99.999, n_w_th = 250):
@@ -117,6 +131,26 @@ def count_connections_2(weight_matrix, K_arr = np.arange(11),
     return (all_w_arrs, all_sh_w_arrs, all_cdfs, all_sh_cdfs)
 
 
+def count_connections_3(weight_matrix):
+    n_hidden, n_sel_cells = weight_matrix.shape
+    assert n_hidden < n_sel_cells
+
+    shuffled_weights = weight_matrix.reshape(n_sel_cells * n_hidden)  # reshape
+    shuffled_inds = np.arange(n_sel_cells * n_hidden)  # create new idns
+    np.random.shuffle(shuffled_inds)  # shuffle
+    shuffled_weights = shuffled_weights[shuffled_inds]  # resample
+    shuffled_weights = shuffled_weights.reshape(n_hidden, n_sel_cells)  # reshape
+
+    # degree_vu = np.sqrt(np.sum(np.abs(weight_matrix) ** 2, 0))
+    assert 100 * (1 - 1 / n_hidden) ==  99.5, 100 - 1 / n_hidden
+    threshold = np.percentile(np.abs(weight_matrix), 99.5)  # 99.5 = 100 - 1/n_hu
+    degree_vu = np.sum(np.abs(weight_matrix) > threshold, 0)
+    assert len(degree_vu) == n_sel_cells and degree_vu.ndim == 1
+    # degree_vu_sh = np.sqrt(np.sum(np.abs(shuffled_weights) ** 2, 0))
+    degree_vu_sh = np.sum(np.abs(shuffled_weights) > threshold, 0)
+
+    return (degree_vu, degree_vu_sh)
+
 def freq_distr_weighted_regions(w_vector, m_labels):
     w_vector = np.abs(w_vector)
     weighted_labels = np.dot(w_vector, m_labels)
@@ -221,3 +255,19 @@ def load_reprod_matrix(path, swap=False):
     if swap:
         dict_matrices['RBM'], dict_matrices['covariance'] = dict_matrices['covariance'], dict_matrices['RBM']
     return dict_matrices
+
+
+def compute_median_state_occupancy(activity, bimodality=0, freq=1):
+    n_units, n_times = activity.shape
+    median_activity_period = np.zeros((n_units, 2))
+
+    for mu in range(n_units):
+        tmp = np.sign(activity[mu, :] - bimodality)  # +1 or -1, as bimodality is around 0
+        tmp_inds = np.where(tmp[1:] - tmp[:-1])[0] # where non zero? = state change
+
+        duration_1 = (tmp_inds[1::2] - tmp_inds[:-1:2]) / freq  # skip 1 to only get 1 state type.
+        duration_2 = (tmp_inds[2::2] - tmp_inds[1:-1:2]) / freq # get the other type
+
+        median_activity_period[mu, 0] = np.maximum(np.median(duration_1), np.median(duration_2))
+        median_activity_period[mu, 1] = np.minimum(np.median(duration_1), np.median(duration_2))
+    return median_activity_period

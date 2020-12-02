@@ -84,7 +84,8 @@ def break_word(word, break_size=25):
     return word
 
 def plot_info_hu(raster_order, hu_activity, RBM, rec, selection_neurons,
-                 mu=82, n_regions=8, abs_th=0.05, region_absolute=True, save_fig=False):
+                 mu=82, n_regions=8, abs_th=0.05, region_absolute=True, save_fig=False,
+                 save_folder='/home/thijs/repos/zf-rbm/figures/HU_info_2020-05-16-0844/'):
     '''Function to plot HU with dynamic activity and top regions
 
     Parameters:
@@ -187,40 +188,98 @@ def plot_info_hu(raster_order, hu_activity, RBM, rec, selection_neurons,
     ax_regions.spines['right'].set_visible(False)
 
     if save_fig:
-        plt.savefig(f'/home/thijs/repos/zf-rbm/figures/HU_info_2020-05-16-0844/test_{raster_order_reverse[mu]}.pdf',
+        plt.savefig(os.path.join(save_folder, f'info_hu_{raster_order_reverse[mu]}.pdf'),
                  dpi=500, bbox_inches='tight')
 
     return fig
 
 def plot_uniform_distr(w_mat, sh_w_mat, cdf_mat, sh_cdf_mat, k_value=0, dr='rbm',
                        print_pval=True, ax=None, plot_legend=False):
-        if ax is None:
-            ax = plt.subplot(111)
-        dict_str_number = {0: '1st', 1: '2nd', 2: '3rd'}
+    '''To be used with af.count_connections_2()'''
+    if ax is None:
+        ax = plt.subplot(111)
+    dict_str_number = {0: '1st', 1: '2nd', 2: '3rd'}
 
-        cdf_plot = np.array([0] + list(cdf_mat[dr][k_value, :]))  # add 0 to start of cum pdf, also pans out with extra weight bin
-        sh_cdf_plot = np.array([0] + list(sh_cdf_mat[dr][k_value, :]))
+    cdf_plot = np.array([0] + list(cdf_mat[dr][k_value, :]))  # add 0 to start of cum pdf, also pans out with extra weight bin
+    sh_cdf_plot = np.array([0] + list(sh_cdf_mat[dr][k_value, :]))
 
 
-        ax.plot(sh_w_mat[dr][k_value, :], sh_cdf_plot, linestyle=':',
-                 label=f'{dr_legend[dr]} shuffled', linewidth=5, color='k')#dr_colors[dr]);
-        ax.plot(w_mat[dr][k_value, :], cdf_plot, color=dr_colors[dr],
-             linewidth=5, label=f'{dr_legend[dr]}');
-        ax.set_title(f'{dict_str_number[k_value]} strongest connection of {dr_legend[dr]}',
-                                       fontdict={'weight': 'bold'})
-        ax.set_xlabel('Largest weight per neuron');
-        ax.set_ylabel(f'Cumulative PDF');
-        if plot_legend:
-            ax.legend(bbox_to_anchor=(0.5, 0.5),
-                                        frameon=False);
+    ax.plot(sh_w_mat[dr][k_value, :], sh_cdf_plot, linestyle=':',
+             label=f'{dr_legend[dr]} shuffled', linewidth=5, color='k')#dr_colors[dr]);
+    ax.plot(w_mat[dr][k_value, :], cdf_plot, color=dr_colors[dr],
+         linewidth=5, label=f'{dr_legend[dr]}');
+    ax.set_title(f'{dict_str_number[k_value]} strongest connection of {dr_legend[dr]}',
+                                   fontdict={'weight': 'bold'})
+    ax.set_xlabel('Largest weight per neuron');
+    ax.set_ylabel(f'Cumulative PDF');
+    if plot_legend:
+        ax.legend(bbox_to_anchor=(0.5, 0.5),
+                                    frameon=False);
 
-        p_val = scipy.stats.ks_2samp(cdf_plot, sh_cdf_plot)[1]
-        x_pos = np.minimum(w_mat[dr][k_value, 0], sh_w_mat[dr][k_value, 0])
-        ax.text(s=f'P = {np.round(p_val, 3)}', x=x_pos, y=0.8)
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
+    p_val = scipy.stats.ks_2samp(cdf_plot, sh_cdf_plot)[1]
+    x_pos = np.minimum(w_mat[dr][k_value, 0], sh_w_mat[dr][k_value, 0])
+    ax.text(s=f'P = {np.round(p_val, 3)}', x=x_pos, y=0.8)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
 
-        return ax
+    return ax
+
+def plot_degree_distr(degree_dict, degree_dict_sh, ax=None, dr='rbm', plot_shuffled=True,
+                      bar_width=None, cutoff=8, normalise=False):
+    assert dr in degree_dict.keys(), f'{dr} not in degree_dict'
+    assert degree_dict[dr].min() == 0 and degree_dict_sh[dr].min() == 0  # make life easy
+    if ax is None:
+        ax = plt.subplot(111)
+
+
+    max_degree = degree_dict[dr].max()
+    max_degree_sh = degree_dict_sh[dr].max()
+
+    degree_values = np.arange(cutoff + 1)
+    degree_values_sh = np.arange(cutoff + 1)
+    tmp_bar_heights = np.array([np.sum(degree_dict[dr] == d) for d in range(max_degree + 1)])
+    tmp_bar_heights_sh = np.array([np.sum(degree_dict_sh[dr] == d) for d in range(max_degree_sh + 1)])
+    bar_heights = np.zeros_like(degree_values)
+    bar_heights_sh = np.zeros_like(degree_values_sh)
+    bar_heights[:cutoff] = tmp_bar_heights[:cutoff]
+    bar_heights_sh[:cutoff] = tmp_bar_heights_sh[:cutoff]
+    bar_heights[cutoff] = np.sum(tmp_bar_heights[cutoff:])
+    bar_heights_sh[cutoff] = np.sum(tmp_bar_heights_sh[cutoff:])
+
+    assert np.sum(bar_heights) == np.sum(tmp_bar_heights)
+    if normalise:
+        bar_heights = bar_heights / np.sum(bar_heights)
+        bar_heights_sh = bar_heights_sh / np.sum(bar_heights_sh)
+    if bar_width is None:
+        if plot_shuffled:
+            bar_width = 0.4
+            x_degrees = degree_values - bar_width / 2
+        else:
+            bar_width = 0.8
+            x_degrees = degree_values
+    ax.bar(x=x_degrees, height=bar_heights, width=bar_width, color=dr_colors[dr],
+           label=dr_legend[dr])
+    if plot_shuffled:
+        ax.bar(x=degree_values_sh + bar_width / 2, height=bar_heights_sh,
+               width=bar_width, color=dr_colors[dr], alpha=0.4,
+               label='shuffled '+ dr_legend[dr])
+
+    if plot_shuffled:
+        ax.legend(loc='upper right', frameon=False)
+    ax.set_xticks(degree_values)
+    xlabels = [str(x) for x in degree_values]
+    xlabels[-1] = f'>{xlabels[-2]}'
+    ax.set_xticklabels(xlabels)
+    ax.set_xlabel('Degree of connections to hidden layer')
+    if normalise:
+        ax.set_ylabel('PDF')
+    else:
+        ax.set_ylabel('Frequency')
+    ax.set_title(f'Connectivity to hidden layer {dr_legend[dr]}', fontdict={'weight': 'bold'})
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    return ax
+
 
 def plot_binned_stats(ax, plot_bins, mean_bins, std_bins, comp_moment=None):
     if comp_moment is not None:
@@ -255,3 +314,45 @@ def plot_reproduc_mat(dict_mat, key, ax=None):
     bottom, top = ax.get_ylim()
     ax.set_ylim(bottom + 0.5, top - 0.5);
     ax.set_title('Similarity between individual fish', fontdict={'weight': 'bold'})
+
+## Old example plots of indiviudal HUs, using mu_arr = dict('rbm' : [0, 2]) etc
+# sax = {}; iplot=0
+# # time_slice = slice(0, 500)
+# for i_dr, dr in enumerate(plot_methods):
+#     for i_mu, mu in enumerate(mu_arr[dr]):
+#         weighted_labels[dr] = freq_distr_weighted_regions(w_vector=weights[dr][mu, :], m_labels=plot_labels)
+#         iplot += 1
+#         sax[iplot] = plt.subplot(9, 5, int(i_dr + 3 + (i_mu*15)))
+#     #         sax[iplot].plot(weighted_labels[dr], label=f'{dr_legend[dr]}, S={np.round(freq_entropy(weighted_labels[dr]), 2)}',
+#     #                         linewidth=1, alpha=1, color=dr_colors[dr])
+# #         sax[iplot].plot(low_dyn_test[dr][mu, time_slice], linewidth=1, color=dr_colors[dr])
+# #         sax[iplot].get_yaxis().set_visible(False); sax[iplot].get_yaxis().set_ticks([])
+# #         sax[iplot].get_xaxis().set_visible(False); sax[iplot].get_xaxis().set_ticks([])
+#     #     plt.xlabel('Region id'); #plt.ylabel('P(region)'); plt.title(f'Example P(region) for HU {mu}')
+#         if i_dr == 1 and i_mu == 0:
+#             plt.title('Example components and time traces')
+
+def plot_one_stat(density, xbins, ybins, title='', ax=None):
+
+    if ax is None:
+        ax = plt.subplot(111)
+    image = ax.imshow(np.log(density),
+#                              interpolation='nearest', # do not use. (needed for high number of data points, but messes up pdf)
+                                cmap='mako', origin='low', #vmin=-20, vmax=0,
+               extent=[xbins[0], xbins[-1], ybins[0], ybins[-1]], aspect='auto')
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.1)
+    plt.colorbar(image, cax=cax)  # https://stackoverflow.com/questions/46314646/change-matplotlib-colorbar-to-custom-height
+    x_ticks = ax.get_xticks()[1:-1]  # first and last one are not shown
+    ax.set_yticks(x_ticks)
+    ax.set_xticks(x_ticks)
+    ax.spines['top'].set_visible(False)
+
+    ax.spines['right'].set_visible(False)
+#     plt.plot(xbins[1:], density.sum(1))
+#     plt.plot(xbins[1:], density.sum(0))
+
+    ax.set_xlabel(f'Experimental data');
+    ax.set_ylabel(f'Model-generated data')
+    ax.set_title(title)
+    return ax
