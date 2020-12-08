@@ -301,16 +301,17 @@ def plot_binned_stats(ax, plot_bins, mean_bins, std_bins, comp_moment=None):
 def plot_reproduc_mat(dict_mat, key, ax=None):
     if ax is None:
         ax = plt.subplot(111)
-    data = dict_mat[key]['mat']
+    data = dict_mat[key]['pearson']
     mask = np.zeros_like(data)
     mask[np.triu_indices_from(data, k=0)] = True
-    sns.heatmap(data, annot=True, ax=ax, square=True, mask=mask, vmin=0, vmax=1,
+    sns.heatmap(data, annot=False, ax=ax, square=True, mask=mask, vmin=0, vmax=1,
                 cmap='pink_r', cbar_kws={'label': 'Pearson correlation'})
     ax.set_xlabel('# Fish')
     ax.set_ylabel('# Fish')
     ax.set_xticks(np.arange(len(data) - 1) + 0.5)
     ax.set_yticks(np.arange(1, len(data)) + 0.5)
-    ax.set_yticklabels([str(x + 1) for x in range(len(data))])
+    ax.set_xticklabels([str(x + 1) for x in range(len(data))])
+    ax.set_yticklabels([str(x + 2) for x in range(len(data))])
     bottom, top = ax.get_ylim()
     ax.set_ylim(bottom + 0.5, top - 0.5);
     ax.set_title('Similarity between individual fish', fontdict={'weight': 'bold'})
@@ -356,3 +357,137 @@ def plot_one_stat(density, xbins, ybins, title='', ax=None):
     ax.set_ylabel(f'Model-generated data')
     ax.set_title(title)
     return ax
+
+def plot_connectivity_matrix(matrix, region_names, size=15, subset=range(72), cbar=False,
+                             scale_limits=True, ax=None, region_order_dict=None,
+                             plot_log=False, reverse_x=True, plot_labels=True,
+                             mini=None, maxi=None):
+    if ax is None:
+        return_fig = True
+        fig, ax = plt.subplots()
+        fig.set_figheight(size)
+        fig.set_figwidth(size)
+
+    else:
+        return_fig = False
+
+    matrix = matrix.copy()
+    if region_order_dict is not None:
+        sorted_region_inds, sorted_region_names = [], []
+        # matrix = matrix[sorted_region_inds, :][:, sorted_region_inds]
+        tmp_switch_old_new = np.zeros_like(region_order_dict['inds'])
+        for old_ind, new_ind in enumerate(region_order_dict['inds']):  # eg 0, 70 => arf (0 alphabet) is at 70 (kunst ea)
+            tmp_switch_old_new[new_ind] = old_ind
+        for new_ind, old_ind in enumerate(tmp_switch_old_new):
+            if old_ind in subset: ## only select region that are in subset
+                sorted_region_inds.append(old_ind)
+                sorted_region_names.append(region_order_dict['names'][new_ind])
+                # sorted_region_names.append(region_names[old_ind])
+        matrix_use = matrix[np.array(sorted_region_inds), :][:, np.array(sorted_region_inds)]
+        region_names_use = sorted_region_names
+        # print(region_names_use)
+    else:
+        matrix_use = matrix[subset, :][:, subset]
+        region_names_use = [region_names[x] for x in subset]
+
+    if scale_limits:
+        # off_diagonal = 1 - np.eye(len(subset))
+        # off_diagonal = off_diagonal.astype(np.bool)
+        # matrix_use = matrix_use[off_diagonal]
+        # maxi = 3 * np.sqrt(np.nanmean(matrix_use**2))
+        for i_scale in range(2):  # need the loop because we need to add mini to matrix andd then re estimate in case of log
+            tmp = matrix_use[np.logical_not(np.isnan(matrix_use))]
+            tmp = tmp[np.where(tmp != 0)]  # because these ruin logs
+            if mini is None:
+                mini = np.percentile(tmp, 10)
+                if i_scale == 0:  # add for log taking
+                    matrix_use += 0.1 * mini
+                    mini = None # for next it
+            if maxi is None and i_scale == 1:
+                maxi = np.percentile(tmp, 95)
+            if i_scale == 0:
+                if plot_log:
+                    matrix_use = np.log10(matrix_use)
+    else:
+        if plot_log:
+            matrix_use = np.log10(matrix_use)
+    # print(mini,  maxi)
+
+    im = ax.imshow(matrix_use, vmin=mini, vmax=maxi, cmap='jet')
+    if plot_labels:
+        ax.set_xticks(range(len(subset)))
+        ax.set_xticklabels(region_names_use, rotation=90, fontsize=6)
+        ax.set_yticks(range(len(subset)))
+        ax.set_yticklabels(region_names_use, rotation=0, fontsize=6)
+    else:
+        ax.set_xticks([])
+        ax.set_yticks([])
+    bottom, top = ax.get_ylim()
+    ax.set_ylim(bottom + 0.5, top - 0.5);
+    for name_spine in ['top', 'right', 'left', 'bottom']:
+        ax.spines[name_spine].set_visible(False)
+
+
+    if cbar:
+        plt.colorbar(im, ax=ax)
+    if reverse_x:
+        ax.invert_xaxis()
+    if return_fig:
+        return fig
+    else:
+        return ax
+
+def plot_distr(mat, min_th=1e-8):
+    fig = plt.figure(figsize=[12, 5])
+    ax_1 = fig.add_subplot(121)
+    ax_log = fig.add_subplot(122)
+
+    # mat = mat[np.where(mat != 0)]
+    # mat = mat[np.where(mat < 0.0001)]
+    mat = mat[np.where(mat > min_th)]
+    ax_1.hist(mat.flatten(), bins=50)
+
+    ax_log.hist(np.log10(mat[np.where(mat != 0)].flatten()), bins=50)
+
+def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None, key=None):
+    if ax is None:
+        ax = plt.subplot(111)
+    assert struct_mat.shape == funct_mat.shape
+    struct_mat = struct_mat[subset, :][:, subset]
+    funct_mat = funct_mat[subset, :][:, subset]
+    # struct_mat = struct_mat.flatten() + 1e-12
+    # funct_mat = funct_mat.flatten()  +1e-12
+    # inds = np.where(np.logical_and(struct_mat > 0, struct_mat < 15))
+    # funct_mat = funct_mat[inds]
+    # struct_mat = struct_mat[inds]
+
+    inds = np.where(funct_mat > 1e-7)
+    funct_mat  = funct_mat[inds]
+    struct_mat = struct_mat[inds]
+
+    inds = np.where(struct_mat > 1e-7)
+    funct_mat  = funct_mat[inds]
+    struct_mat = struct_mat[inds]
+    #
+    # struct_mat = np.log10(struct_mat)
+    # funct_mat = np.log10(funct_mat)
+    pearson = np.corrcoef(struct_mat, funct_mat)[1, 0]
+    if key.lower() in dr_colors.keys():
+        color_dots = dr_colors[key.lower()]
+    else:
+        color_dots = 'grey'
+    ax.set_yscale('log')
+    ax.set_xscale('log')
+    ax.scatter(struct_mat, funct_mat, color=color_dots, s=10)
+    # sns.jointplot(struct_mat, funct_mat, ax=ax)
+    ax.set_xlabel('Structural connectivity (log)')
+    ax.set_ylabel('Functional connectivity (log)')
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.set_title(f'Structural vs functional connectivity\nr^2 = {np.round(pearson, 2)}',
+                 fontdict={'weight': 'bold'})
+
+    ax.set_xlim([0.9 * struct_mat.min(), 1.1 * struct_mat.max()])
+    ax.set_ylim([0.9 * funct_mat.min(), 1.1 * funct_mat.max()])
+    return pearson
+    # ax.set_title('')

@@ -243,14 +243,14 @@ def load_reprod_matrix(path, swap=False):
         else:
             dict_matrices[current_meth]['raw_mat'].append(line.rstrip())
     for meth in dict_matrices.keys():
-        dict_matrices[meth]['mat'] = np.zeros((len(dict_matrices[meth]['raw_mat']) - 1,
+        dict_matrices[meth]['pearson'] = np.zeros((len(dict_matrices[meth]['raw_mat']) - 1,
                                                len(dict_matrices[meth]['raw_mat']) - 1))
         for i_line, line in enumerate(dict_matrices[meth]['raw_mat']):
             if i_line == 0:
                 continue  # skip first one because its just indices
             list_el = line.split()
             list_el = [float(x) for x in list_el[1:]]  # skip first becaues its an index
-            dict_matrices[meth]['mat'][i_line - 1, :] = np.array(list_el)  # -1 because of i_line > 0
+            dict_matrices[meth]['pearson'][i_line - 1, :] = np.array(list_el)  # -1 because of i_line > 0
 
     if swap:
         dict_matrices['RBM'], dict_matrices['covariance'] = dict_matrices['covariance'], dict_matrices['RBM']
@@ -271,3 +271,29 @@ def compute_median_state_occupancy(activity, bimodality=0, freq=1):
         median_activity_period[mu, 0] = np.maximum(np.median(duration_1), np.median(duration_2))
         median_activity_period[mu, 1] = np.minimum(np.median(duration_1), np.median(duration_2))
     return median_activity_period
+
+def create_mapping_kunstea_order(current_regions):
+
+    file_translation = '/home/thijs/repos/zf-rbm/baier_atlas_labels/region_names_baier_abbreviations.txt'
+    file_order = '/home/thijs/repos/zf-rbm/baier_atlas_labels/order_baier_regions_kunstetal.txt'
+
+    dict_long_to_short = {}
+    dict_short_to_long = {}
+    with open(file_translation, 'r') as f:
+        content = f.readlines()
+    for line in content:
+        split_line = [x.rstrip() for x in line.split(' ')]
+        assert len(split_line) == 2, split_line
+        long, short = split_line
+        dict_long_to_short[long] = short
+        dict_short_to_long[short] = long
+
+    with open(file_order, 'r') as f:
+        array_order = np.array([x.rstrip() for x in f.readlines()])
+
+    new_inds = np.zeros(len(current_regions))
+    for i_reg, reg in enumerate(current_regions):
+        # print( np.where(array_order == dict_long_to_short[reg]), dict_long_to_short[reg])
+        new_inds[i_reg] = int(np.where(array_order == dict_long_to_short[reg])[0][0])
+    new_inds = new_inds.astype('int')
+    return new_inds, array_order
