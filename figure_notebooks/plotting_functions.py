@@ -47,17 +47,34 @@ def set_fontsize(font_size=12):
     plt.rcParams.update(params)
 
 def plot_example_hu(ax=None, hu_screenshot_folder='/home/thijs/repos/zf-rbm/figures/HU_screenshots_2020-05-16-0844',
-                    hu_id=86, filename_prefix='screenshot_hu_', y_min=400, y_max=1600, fontsize=10):
+                    hu_id=86, id_reference='internal',
+                    filename_prefix='screenshot_hu_', y_min=400, y_max=1600,
+                    fontsize=10, raster_order=None):
     '''fontsize: 15 for (10, 10) fig, linearly scaling seems fine '''
-
+    assert id_reference == 'internal' or id_reference == 'raster'  # does the ID refer to internal index or (dynamic) raster plot index?
+    if raster_order is not None:
+        raster_order_reverse = np.zeros_like(raster_order)  # reverse order to find corresponding names
+        for i_map, map in enumerate(raster_order):
+            raster_order_reverse[map] = i_map
+    if id_reference == 'internal':
+        load_id = hu_id
+        internal_id = hu_id
+        if raster_order is not None:
+            raster_id = raster_order_reverse[hu_id]
+        else:
+            raster_id = 'NA'
+    elif id_reference == 'raster':
+        assert raster_order is not None
+        load_id = raster_order[hu_id]
+        internal_id = load_id
+        raster_id = hu_id
     # screenshot_files = os.listdir(hu_screenshot_folder)
-    filename = filename_prefix + str(hu_id).zfill(3) + '.png'
+    filename = filename_prefix + str(load_id).zfill(3) + '.png'
     image = mpimg.imread(os.path.join(hu_screenshot_folder, filename))
 
     if ax is None:
         ax = plt.subplot(111)
     ax.imshow(image[:, y_min:y_max, :])
-    # ax.text(s=f'HU {hu_id}', x=100, y=100, c='white')
     ax.text(s='Ro', x=25, y=71, c='white', fontdict={'size': fontsize})
     ax.text(s='C', x=145, y=71, c='white', fontdict={'size': fontsize})
     ax.text(s='R', x=95, y=1, c='white', fontdict={'size': fontsize, 'va': 'top'})
@@ -69,7 +86,7 @@ def plot_example_hu(ax=None, hu_screenshot_folder='/home/thijs/repos/zf-rbm/figu
     ax.text(s='V', x=95, y=624, c='white', fontdict={'size': fontsize})
     ax.text(s='0.1 mm', x=1000, y=840, c='white', fontdict={'size': fontsize})
 
-    ax.set_title(f'Hidden unit {hu_id}', fontdict={'weight': 'bold'})
+    ax.set_title(f'HU index: raster: {raster_id}, internal: {internal_id}', fontdict={'weight': 'bold'})
     ax.axis('off')
 
     return ax
@@ -270,7 +287,7 @@ def plot_degree_distr(degree_dict, degree_dict_sh, ax=None, dr='rbm', plot_shuff
     xlabels = [str(x) for x in degree_values]
     xlabels[-1] = f'>{xlabels[-2]}'
     ax.set_xticklabels(xlabels)
-    ax.set_xlabel('Degree of connections to hidden layer')
+    ax.set_xlabel('# Strong weights per neuron')
     if normalise:
         ax.set_ylabel('PDF')
     else:
@@ -461,17 +478,26 @@ def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None, k
     # funct_mat = funct_mat[inds]
     # struct_mat = struct_mat[inds]
 
-    inds = np.where(funct_mat > 1e-7)
+    inds = np.where(funct_mat < 1e-1)
     funct_mat  = funct_mat[inds]
     struct_mat = struct_mat[inds]
 
     inds = np.where(struct_mat > 1e-7)
     funct_mat  = funct_mat[inds]
     struct_mat = struct_mat[inds]
+
+    x_lim = (0.9 * struct_mat.min(), 1.1 * struct_mat.max())
+    y_lim = (0.9 * funct_mat.min(), 1.1 * funct_mat.max())
     #
-    # struct_mat = np.log10(struct_mat)
-    # funct_mat = np.log10(funct_mat)
-    pearson = np.corrcoef(struct_mat, funct_mat)[1, 0]
+    struct_mat_corr = struct_mat
+    funct_mat_corr = funct_mat
+
+    # struct_mat_corr = np.log10(struct_mat)
+    # funct_mat_corr = np.log10(funct_mat)
+
+    pearson = np.corrcoef(struct_mat_corr, funct_mat_corr)[1, 0]
+    spearman = scipy.stats.spearmanr(struct_mat_corr, funct_mat_corr).correlation
+    print(key, pearson, spearman)
     if key.lower() in dr_colors.keys():
         color_dots = dr_colors[key.lower()]
     else:
@@ -484,10 +510,10 @@ def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None, k
     ax.set_ylabel('Functional connectivity (log)')
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
-    ax.set_title(f'Structural vs functional connectivity\nr^2 = {np.round(pearson, 2)}',
+    ax.set_title(f'Structural vs functional connectivity\nr = {np.round(spearman, 2)}',
                  fontdict={'weight': 'bold'})
 
-    ax.set_xlim([0.9 * struct_mat.min(), 1.1 * struct_mat.max()])
-    ax.set_ylim([0.9 * funct_mat.min(), 1.1 * funct_mat.max()])
-    return pearson
+    ax.set_xlim(x_lim)
+    ax.set_ylim(y_lim)
+    return (pearson, spearman)
     # ax.set_title('')
