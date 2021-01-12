@@ -354,7 +354,7 @@ def plot_one_stat(density, xbins, ybins, title='', ax=None):
 
     if ax is None:
         ax = plt.subplot(111)
-    image = ax.imshow(np.log(density),
+    image = ax.imshow(np.log10(density),
 #                              interpolation='nearest', # do not use. (needed for high number of data points, but messes up pdf)
                                 cmap='mako', origin='low', #vmin=-20, vmax=0,
                extent=[xbins[0], xbins[-1], ybins[0], ybins[-1]], aspect='auto')
@@ -372,6 +372,7 @@ def plot_one_stat(density, xbins, ybins, title='', ax=None):
 
     ax.set_xlabel(f'Experimental data');
     ax.set_ylabel(f'Model-generated data')
+    cax.set_ylabel('10-log PDF')
     ax.set_title(title)
     return ax
 
