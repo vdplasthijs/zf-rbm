@@ -1,0 +1,17 @@
+inkscape, load png screenshot
+Filters -> Fill & transparency -> Light eraser
+Expansion = 0
+Erosion = 1000
+Global Opacity = 1.00
+inverted = True
+
+# plot & save colours in fishualizer:
+open data & all hus
+in console: 
+self.tidy_up_viewboxes(reverse_x=True, draw_outlines=False, draw_crosses=False, draw_scale=False)
+self.draw_all_hus()
+
+import pickle
+# colour dict was printed in console, and put in cluster_dict manually
+with open('/home/thijs/repos/zf-rbm/figures/figure_intro/colours_2021-01-13.pkl', 'wb') as f:
+    pickle.dump(cluster_dict, f)
