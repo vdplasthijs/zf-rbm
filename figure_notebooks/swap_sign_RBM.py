@@ -10,7 +10,7 @@ sys.path.append('/home/thijs/repos/dnp-code/PGM3_correct/utilities/') # the path
 import rbm as rbm
 from fishualizer_utilities import Zecording
 
-def swap_sign_RBM(RBM, verbose=0):
+def swap_sign_RBM(RBM, verbose=0, assert_hu_inds=None):
     '''
     Mostly for neuroscience related applications.
     Excitatory and inhibitory couplings between pairs of neurons are determined by
@@ -26,6 +26,8 @@ def swap_sign_RBM(RBM, verbose=0):
         print(f'{np.sum(change_sign)}/{len(change_sign)} HU weights are flipped')
     if verbose > 1:
         print(f'Flipped HUs are: {np.where(change_sign)}')
+    if assert_hu_inds is not None:  # can be used to assert which HUs should be swapped
+        assert (np.where(change_sign)[0] == np.squeeze(np.array(assert_hu_inds))).all(), 'swapped HUs do not correspond to assert_hu_inds input'
     RBM2 = copy.deepcopy(RBM)
     RBM2.weights[change_sign] *= -1
     RBM2.hlayer.theta_plus[change_sign] = RBM.hlayer.theta_minus[change_sign]
