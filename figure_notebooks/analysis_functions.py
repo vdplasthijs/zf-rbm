@@ -153,8 +153,9 @@ def count_connections_3(weight_matrix):
 
 def freq_distr_weighted_regions(w_vector, m_labels):
     w_vector = np.abs(w_vector)
-    weighted_labels = np.dot(w_vector, m_labels)
-    weighted_labels = weighted_labels / m_labels.sum(0)
+    weighted_labels = np.dot(w_vector, m_labels)  # weighted product of region labels
+    nz_inds = np.where(m_labels.sum(0) != 0)[0]  # avoid zero-division
+    weighted_labels[nz_inds] = weighted_labels[nz_inds] / m_labels[:, nz_inds].sum(0)
     weighted_labels = weighted_labels / np.sum(weighted_labels)
     return weighted_labels
 
