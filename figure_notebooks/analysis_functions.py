@@ -301,7 +301,7 @@ def create_mapping_kunstea_order(current_regions):
     new_inds = new_inds.astype('int')
     return new_inds, array_order
 
-def discretize(h, margin=0.25, plot=False):
+def discretize(h, margin=0.25, plot=False, ax=None):
     '''discretize 1 HU into 3 intervals: mode 1 - no mans land - mode 2. 
     Dependent on margin (0 -> ths on peaks, 0.5 -> ths both on middle)'''
     gmm = GaussianMixture(n_components=2).fit(h[:, np.newaxis])
@@ -311,12 +311,14 @@ def discretize(h, margin=0.25, plot=False):
     threshold1 = mus[0] + (mus[1] - mus[0]) * margin
     threshold2 = mus[1] - (mus[1] - mus[0]) * margin
     if plot:
-        plt.hist(h, bins=100, normed=True, label='HU activity');
-        plt.plot([threshold1, threshold1], [0, 5], c='red', linestyle=':',
+        if ax is None:
+            ax = plt.subplot(111)
+        ax.hist(h, bins=100, density=True, label='HU activity');
+        ax.plot([threshold1, threshold1], [0, 5], c='red', linestyle=':',
                  label='lower threshold')
-        plt.plot([threshold2, threshold2], [0, 5], c='red', label='upper threshold')
-        plt.xlabel('HU activity'); plt.ylabel('PDF')
-        plt.legend()
+        ax.plot([threshold2, threshold2], [0, 5], c='red', label='upper threshold')
+        ax.set_xlabel('HU activity'); ax.set_ylabel('PDF')
+        ax.legend()
         
     return 1 * (h > threshold1) + 1 * (h > threshold2)  # discretise to [0, 1, 2] = [<= th1, >th1 & <= th2, > th2]
 
