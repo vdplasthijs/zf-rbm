@@ -8,7 +8,9 @@
 import numpy as np
 from tqdm import tqdm
 import pandas as pd
+import matplotlib.pyplot as plt
 import scipy.spatial, scipy.cluster
+from sklearn.mixture import GaussianMixture
 
 def opt_leaf(w_mat, dim=0):
     '''create optimal leaf order over dim, of matrix w_mat. if w_mat is not an
@@ -298,3 +300,100 @@ def create_mapping_kunstea_order(current_regions):
         new_inds[i_reg] = int(np.where(array_order == dict_long_to_short[reg])[0][0])
     new_inds = new_inds.astype('int')
     return new_inds, array_order
+
+def discretize(h, margin=0.25, plot=False):
+    '''discretize 1 HU into 3 intervals: mode 1 - no mans land - mode 2. 
+    Dependent on margin (0 -> ths on peaks, 0.5 -> ths both on middle)'''
+    gmm = GaussianMixture(n_components=2).fit(h[:, np.newaxis])
+    mus = gmm.means_
+    order = np.argsort(mus[:, 0])
+    mus = mus[order]
+    threshold1 = mus[0] + (mus[1] - mus[0]) * margin
+    threshold2 = mus[1] - (mus[1] - mus[0]) * margin
+    if plot:
+        plt.hist(h, bins=100, normed=True, label='HU activity');
+        plt.plot([threshold1, threshold1], [0, 5], c='red', linestyle=':',
+                 label='lower threshold')
+        plt.plot([threshold2, threshold2], [0, 5], c='red', label='upper threshold')
+        plt.xlabel('HU activity'); plt.ylabel('PDF')
+        plt.legend()
+        
+    return 1 * (h > threshold1) + 1 * (h > threshold2)  # discretise to [0, 1, 2] = [<= th1, >th1 & <= th2, > th2]
+
+
+def get_burst_and_silence_times(sequence):
+    '''
+    Input:  a discrete time series occupying 3 states {0, 1, 2}
+    Outputs: 
+    - a list of burst durations
+    - a list of silence durations.
+    - a list of period durations (= silence + burst)
+    '''    
+    assert np.array([x in [0, 1, 2] for x in np.unique(sequence)]).all(), 'input sequence is not discretised'
+   
+    list_burst_intervals = []
+    list_silence_intervals = []
+    T = len(sequence)
+
+    interval_is_silence = True
+    interval_start = 0
+    interval_end = 0
+
+    while interval_start < T-1:
+        interval_end = interval_start  # reset 
+        if interval_is_silence:  # if in down state, loop while in down state
+            while (sequence[interval_end] < 2) & (interval_end < T - 1): 
+                interval_end += 1  # increase lenght of down state interval
+        else:  # if in up state, loop while in up state
+            while (sequence[interval_end] > 0) & (interval_end < T - 1):
+                interval_end += 1
+        ## end of previous interval is reached        
+        
+        if interval_is_silence:  # if previous interval was down
+            if (interval_end < T - 1) & (interval_start > 0):  # if not first and not end          
+                list_silence_intervals.append((interval_start, interval_end))  # add to down list
+            interval_is_silence = False  # switch
+        else:  # reverse 
+            if (interval_end < T - 1) & (interval_start > 0):            
+                list_burst_intervals.append((interval_start, interval_end))
+            interval_is_silence = True
+
+        interval_start = interval_end  # se tup next interval
+        
+    list_silence_durations = [end - start for start, end in list_silence_intervals]  # calculate durations
+    list_burst_durations = [end - start for start, end in list_burst_intervals]
+    list_period_durations = [list_silence_durations[x] + list_burst_durations[x] 
+                             for x in range(np.minimum(len(list_silence_durations), 
+                                                       len(list_burst_durations)))]
+    assert np.abs(len(list_silence_durations) - len(list_burst_durations)) <= 1
+    return list_silence_durations, list_burst_durations, list_period_durations
+
+def compute_median_discretised_state_occupancy(activity_mat, frequency=1, margin=0.4, verbose=1):
+    '''Compute state occupancy stats by discretising first'''
+    
+    n_hu = activity_mat.shape[0]
+    if verbose > 0:
+        print(f'Number of units: {n_hu}')
+    median_silence_duration = np.zeros(n_hu)
+    median_burst_duration = np.zeros(n_hu)
+    median_period_duration = np.zeros(n_hu)
+    count_bursts = np.zeros(n_hu)
+
+    for mu in range(n_hu):
+        discrete_h = discretize(activity_mat[mu, :], margin=margin, plot=False)  # discretised signal to {0, 1, 2}
+        if verbose > 1:
+            print('Unit %s, P(h=-1)=%.3f,P(h=0)=%.3f,P(h=+1)=%.3f'% (
+                mu, 
+                (discrete_h==0).mean(),
+                (discrete_h==1).mean(),
+                (discrete_h==2).mean()  )
+                 )  # print average occupancy rates of the 3 states 
+
+        list_silence_durations, list_burst_durations, list_period_durations = get_burst_and_silence_times(discrete_h)
+        median_silence_duration[mu] = np.median(list_silence_durations / frequency)
+        median_burst_duration[mu] = np.median(list_burst_durations / frequency)
+        median_period_duration[mu] = np.median(list_period_durations / frequency)
+        count_bursts[mu] = len(list_burst_durations)
+
+    return median_silence_duration, median_burst_duration, median_period_duration, count_bursts
+
