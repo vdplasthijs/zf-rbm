@@ -2729,16 +2729,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.5"
-     inkscape:cx="-62.832021"
-     inkscape:cy="662.73515"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="321.06839"
+     inkscape:cy="790.65747"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1025"
+     inkscape:window-height="1052"
      inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:window-y="1080"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata5237">
@@ -5213,7 +5213,7 @@
          x="106.65829"
          y="132.59256"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.86722255px;line-height:125%;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans';text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.25781476;stroke-linecap:butt;stroke-linejoin:round"
-         id="tspan90525">VU-HU</tspan><tspan
+         id="tspan90525">sparse</tspan><tspan
          sodipodi:role="line"
          x="106.65829"
          y="137.42659"

@@ -242,15 +242,27 @@ def plot_uniform_distr(w_mat, sh_w_mat, cdf_mat, sh_cdf_mat, k_value=0, dr='rbm'
     return ax
 
 def plot_degree_distr(degree_dict, degree_dict_sh, ax=None, dr='rbm', plot_shuffled=True,
-                      bar_width=None, cutoff=8, normalise=False):
+                      bar_width=None, cutoff=8, normalise=False, colour=None,
+                      label=None, label_sh=None, v_spacing_greater=False):
     assert dr in degree_dict.keys(), f'{dr} not in degree_dict'
-    assert degree_dict[dr].min() == 0 and degree_dict_sh[dr].min() == 0  # make life easy
+    assert degree_dict[dr].min() == 0 or degree_dict_sh[dr].min() == 0  # make life easy
     if ax is None:
         ax = plt.subplot(111)
-
+    if colour is None:
+        colour = dr_colors[dr]
+    if label is None:
+        label = dr_legend[dr]
+    if label_sh is None:
+        label_sh = 'shuffled ' + dr_legend[dr]
 
     max_degree = degree_dict[dr].max()
     max_degree_sh = degree_dict_sh[dr].max()
+    if cutoff > max_degree:
+        cutoff = max_degree
+        print(f'cut off decreased to max degree {max_degree}')
+    if cutoff > max_degree_sh:
+        cutoff = max_degree_sh
+        print(f'cut off decreased to max degree shuffled {max_degree_sh}')
 
     degree_values = np.arange(cutoff + 1)
     degree_values_sh = np.arange(cutoff + 1)
@@ -274,25 +286,28 @@ def plot_degree_distr(degree_dict, degree_dict_sh, ax=None, dr='rbm', plot_shuff
         else:
             bar_width = 0.8
             x_degrees = degree_values
-    ax.bar(x=x_degrees, height=bar_heights, width=bar_width, color=dr_colors[dr],
-           label=dr_legend[dr])
+    ax.bar(x=x_degrees, height=bar_heights, width=bar_width, color=colour,
+           label=label)
     if plot_shuffled:
         ax.bar(x=degree_values_sh + bar_width / 2, height=bar_heights_sh,
-               width=bar_width, color=dr_colors[dr], alpha=0.4,
-               label='shuffled '+ dr_legend[dr])
+               width=bar_width, color=colour, alpha=0.4,
+               label=label_sh)
 
     if plot_shuffled:
         ax.legend(loc='upper right', frameon=False)
     ax.set_xticks(degree_values)
     xlabels = [str(x) for x in degree_values]
-    xlabels[-1] = f'>{xlabels[-2]}'
+    if v_spacing_greater:
+        xlabels[-1] = '>'
+    else:
+        xlabels[-1] = f'>{xlabels[-2]}'
     ax.set_xticklabels(xlabels)
     ax.set_xlabel('# Strong weights per neuron')
     if normalise:
         ax.set_ylabel('PDF')
     else:
         ax.set_ylabel('Frequency')
-    ax.set_title(f'Connectivity to hidden layer {dr_legend[dr]}', fontdict={'weight': 'bold'})
+    ax.set_title(f'Connectivity to hidden layer {label}', fontdict={'weight': 'bold'})
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     return ax

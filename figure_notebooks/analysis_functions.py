@@ -270,9 +270,16 @@ def compute_median_state_occupancy(activity, bimodality=0, freq=1):
 
         duration_1 = (tmp_inds[1::2] - tmp_inds[:-1:2]) / freq  # skip 1 to only get 1 state type.
         duration_2 = (tmp_inds[2::2] - tmp_inds[1:-1:2]) / freq # get the other type
-
-        median_activity_period[mu, 0] = np.maximum(np.median(duration_1), np.median(duration_2))
-        median_activity_period[mu, 1] = np.minimum(np.median(duration_1), np.median(duration_2))
+        if len(duration_1) == 1 and len(duration_2) == 0:
+            median_activity_period[mu, :] = duration_1[0]
+        elif len(duration_1) == 0 and len(duration_2) == 0:
+            median_activity_period[mu, :] = 0
+        else:
+            median_activity_period[mu, 0] = np.maximum(np.median(duration_1), np.median(duration_2))
+            median_activity_period[mu, 1] = np.minimum(np.median(duration_1), np.median(duration_2))
+        if np.isnan(median_activity_period[mu, 0]):
+            print('ERROR: NaN found - BREAKING')
+            return
     return median_activity_period
 
 def create_mapping_kunstea_order(current_regions):
@@ -302,7 +309,7 @@ def create_mapping_kunstea_order(current_regions):
     return new_inds, array_order
 
 def discretize(h, margin=0.25, plot=False, ax=None):
-    '''discretize 1 HU into 3 intervals: mode 1 - no mans land - mode 2. 
+    '''discretize 1 HU into 3 intervals: mode 1 - no mans land - mode 2.
     Dependent on margin (0 -> ths on peaks, 0.5 -> ths both on middle)'''
     gmm = GaussianMixture(n_components=2).fit(h[:, np.newaxis])
     mus = gmm.means_
@@ -319,20 +326,20 @@ def discretize(h, margin=0.25, plot=False, ax=None):
         ax.plot([threshold2, threshold2], [0, 5], c='red', label='upper threshold')
         ax.set_xlabel('HU activity'); ax.set_ylabel('PDF')
         ax.legend()
-        
+
     return 1 * (h > threshold1) + 1 * (h > threshold2)  # discretise to [0, 1, 2] = [<= th1, >th1 & <= th2, > th2]
 
 
 def get_burst_and_silence_times(sequence):
     '''
     Input:  a discrete time series occupying 3 states {0, 1, 2}
-    Outputs: 
+    Outputs:
     - a list of burst durations
     - a list of silence durations.
     - a list of period durations (= silence + burst)
-    '''    
+    '''
     assert np.array([x in [0, 1, 2] for x in np.unique(sequence)]).all(), 'input sequence is not discretised'
-   
+
     list_burst_intervals = []
     list_silence_intervals = []
     T = len(sequence)
@@ -342,37 +349,37 @@ def get_burst_and_silence_times(sequence):
     interval_end = 0
 
     while interval_start < T-1:
-        interval_end = interval_start  # reset 
+        interval_end = interval_start  # reset
         if interval_is_silence:  # if in down state, loop while in down state
-            while (sequence[interval_end] < 2) & (interval_end < T - 1): 
+            while (sequence[interval_end] < 2) & (interval_end < T - 1):
                 interval_end += 1  # increase lenght of down state interval
         else:  # if in up state, loop while in up state
             while (sequence[interval_end] > 0) & (interval_end < T - 1):
                 interval_end += 1
-        ## end of previous interval is reached        
-        
+        ## end of previous interval is reached
+
         if interval_is_silence:  # if previous interval was down
-            if (interval_end < T - 1) & (interval_start > 0):  # if not first and not end          
+            if (interval_end < T - 1) & (interval_start > 0):  # if not first and not end
                 list_silence_intervals.append((interval_start, interval_end))  # add to down list
             interval_is_silence = False  # switch
-        else:  # reverse 
-            if (interval_end < T - 1) & (interval_start > 0):            
+        else:  # reverse
+            if (interval_end < T - 1) & (interval_start > 0):
                 list_burst_intervals.append((interval_start, interval_end))
             interval_is_silence = True
 
         interval_start = interval_end  # se tup next interval
-        
+
     list_silence_durations = [end - start for start, end in list_silence_intervals]  # calculate durations
     list_burst_durations = [end - start for start, end in list_burst_intervals]
-    list_period_durations = [list_silence_durations[x] + list_burst_durations[x] 
-                             for x in range(np.minimum(len(list_silence_durations), 
+    list_period_durations = [list_silence_durations[x] + list_burst_durations[x]
+                             for x in range(np.minimum(len(list_silence_durations),
                                                        len(list_burst_durations)))]
     assert np.abs(len(list_silence_durations) - len(list_burst_durations)) <= 1
     return list_silence_durations, list_burst_durations, list_period_durations
 
 def compute_median_discretised_state_occupancy(activity_mat, frequency=1, margin=0.4, verbose=1):
     '''Compute state occupancy stats by discretising first'''
-    
+
     n_hu = activity_mat.shape[0]
     if verbose > 0:
         print(f'Number of units: {n_hu}')
@@ -385,11 +392,11 @@ def compute_median_discretised_state_occupancy(activity_mat, frequency=1, margin
         discrete_h = discretize(activity_mat[mu, :], margin=margin, plot=False)  # discretised signal to {0, 1, 2}
         if verbose > 1:
             print('Unit %s, P(h=-1)=%.3f,P(h=0)=%.3f,P(h=+1)=%.3f'% (
-                mu, 
+                mu,
                 (discrete_h==0).mean(),
                 (discrete_h==1).mean(),
                 (discrete_h==2).mean()  )
-                 )  # print average occupancy rates of the 3 states 
+                 )  # print average occupancy rates of the 3 states
 
         list_silence_durations, list_burst_durations, list_period_durations = get_burst_and_silence_times(discrete_h)
         median_silence_duration[mu] = np.median(list_silence_durations / frequency)
@@ -398,4 +405,3 @@ def compute_median_discretised_state_occupancy(activity_mat, frequency=1, margin
         count_bursts[mu] = len(list_burst_durations)
 
     return median_silence_duration, median_burst_duration, median_period_duration, count_bursts
-
