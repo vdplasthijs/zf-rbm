@@ -313,6 +313,64 @@ def plot_degree_distr(degree_dict, degree_dict_sh, ax=None, dr='rbm', plot_shuff
     return ax
 
 
+def plot_three_degree_distr(degree_dict, ax=None,
+                      bar_width=None, cutoff=8, normalise=False, colour_dict=None, alpha_dict=None,
+                      v_spacing_greater=False):
+    # assert degree_1.min() == 0 or degree_2.min() == 0 or degree_3.min() == 0 # make life easy
+    if ax is None:
+        ax = plt.subplot(111)
+    if colour_dict is None:
+        colour_dict = {k: 'k' for k in degree_dict.keys()}
+    if alpha_dict is None:
+        alpha_dict = {k: 1 - 0.9 * ii / len(degree_dict.keys()) for ii, k in enumerate(degree_dict.keys())}
+
+    max_degree_dict = {k: v.max() for k, v in degree_dict.items()}
+    for k, v in max_degree_dict.items():
+        if cutoff > v:
+            cutoff = v
+            print(f'cut off decreased to max degree {v}')
+    tmp_bar_heights, bar_heights = {}, {}
+    for k, degree in degree_dict.items():
+        degree_values = np.arange(cutoff + 1)
+        tmp_bar_heights[k] = np.array([np.sum(degree == d) for d in range(max_degree_dict[k] + 1)])
+        bar_heights[k] = np.zeros_like(degree_values)
+        bar_heights[k][:cutoff] = tmp_bar_heights[k][:cutoff]
+        bar_heights[k][cutoff] = np.sum(tmp_bar_heights[k][cutoff:])
+
+        assert np.sum(bar_heights[k]) == np.sum(tmp_bar_heights[k])
+
+        if normalise:
+            bar_heights[k] = bar_heights[k] / np.sum(bar_heights[k])
+
+    if bar_width is None:
+        bar_width = 0.8 / len(degree_dict)
+        x_degrees = degree_values - bar_width / 2
+
+    i_plot = 0
+    for k, b_heights in bar_heights.items():
+        ax.bar(x=x_degrees + bar_width * i_plot, height=b_heights, width=bar_width, color=colour_dict[k],
+               label=k, alpha=alpha_dict[k])
+        i_plot += 1
+    ax.legend(loc='upper right', frameon=False)
+    ax.set_xticks(degree_values)
+    xlabels = [str(x) for x in degree_values]
+    if v_spacing_greater:
+        xlabels[-1] = '>'
+    else:
+        xlabels[-1] = f'>{xlabels[-2]}'
+    ax.set_xticklabels(xlabels)
+    # ax.set_xlabel('# Strong weights per neuron')
+    if normalise:
+        ax.set_ylabel('PDF')
+    else:
+        ax.set_ylabel('Frequency')
+    # ax.set_title(f'Connectivity to hidden layer {label}', fontdict={'weight': 'bold'})
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    return ax
+
+
+
 def plot_binned_stats(ax, plot_bins, mean_bins, std_bins, comp_moment=None):
     if comp_moment is not None:
         plot_color = mom_colors[comp_moment]
