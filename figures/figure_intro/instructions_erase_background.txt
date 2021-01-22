@@ -9,9 +9,11 @@ inverted = True
 open data & all hus
 in console: 
 self.tidy_up_viewboxes(reverse_x=True, draw_outlines=False, draw_crosses=False, draw_scale=False)
-self.draw_all_hus()
+self.add_scale_bar()
+self.draw_all_hus_from_path(overlap='max')  # to load old colours
+# self.draw_all_hus(overlap='max') # for new colours
 
+## to save colour dict:
 import pickle
-# colour dict was printed in console, and put in cluster_dict manually
 with open('/home/thijs/repos/zf-rbm/figures/figure_intro/colours_2021-01-13.pkl', 'wb') as f:
-    pickle.dump(cluster_dict, f)
+    pickle.dump(self.hu_colours, f)

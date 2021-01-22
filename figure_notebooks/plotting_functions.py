@@ -17,6 +17,7 @@ import matplotlib.image as mpimg
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1.colorbar import colorbar as mpl_colorbar
 
+import matplotlib.cm
 import sys,os
 import importlib
 import seaborn as sns
@@ -388,20 +389,20 @@ def plot_binned_stats(ax, plot_bins, mean_bins, std_bins, comp_moment=None):
     ax.set_ylim([plot_bins.min(), plot_bins.max()])
     return ax
 
-def plot_reproduc_mat(dict_mat, key, ax=None):
+def plot_reproduc_mat(dict_mat, key, ax=None, corr_type='pearson'):
     if ax is None:
         ax = plt.subplot(111)
-    data = dict_mat[key]['pearson']
+    data = dict_mat[key][corr_type]
     mask = np.zeros_like(data)
     mask[np.triu_indices_from(data, k=0)] = True
     sns.heatmap(data, annot=False, ax=ax, square=True, mask=mask, vmin=0, vmax=1,
-                cmap='pink_r', cbar_kws={'label': 'Pearson correlation'})
+                cmap='pink_r', cbar_kws={'label': f'{corr_type[0].upper() + corr_type[1:]} correlation'})
     ax.set_xlabel('# Fish')
     ax.set_ylabel('# Fish')
     ax.set_xticks(np.arange(len(data) - 1) + 0.5)
     ax.set_yticks(np.arange(1, len(data)) + 0.5)
-    ax.set_xticklabels([str(x + 1) for x in range(len(data))])
-    ax.set_yticklabels([str(x + 2) for x in range(len(data))])
+    ax.set_xticklabels([str(x + 0) for x in range(len(data))])
+    ax.set_yticklabels([str(x + 1) for x in range(len(data))])
     bottom, top = ax.get_ylim()
     ax.set_ylim(bottom + 0.5, top - 0.5);
     ax.set_title('Similarity between individual fish', fontdict={'weight': 'bold'})
@@ -449,7 +450,8 @@ def plot_one_stat(density, xbins, ybins, title='', ax=None):
     ax.set_title(title)
     return ax
 
-def plot_connectivity_matrix(matrix, region_names, size=15, subset=range(72), cbar=False,
+def plot_connectivity_matrix(matrix, region_names, size=15, subset=range(72),
+                             cbar=False, cax=None,
                              scale_limits=True, ax=None, region_order_dict=None,
                              plot_log=False, reverse_x=True, plot_labels=True,
                              mini=None, maxi=None):
@@ -502,8 +504,6 @@ def plot_connectivity_matrix(matrix, region_names, size=15, subset=range(72), cb
     else:
         if plot_log:
             matrix_use = np.log10(matrix_use)
-    # print(mini,  maxi)
-
     im = ax.imshow(matrix_use, vmin=mini, vmax=maxi, cmap='jet')
     if plot_labels:
         ax.set_xticks(range(len(subset)))
@@ -520,7 +520,11 @@ def plot_connectivity_matrix(matrix, region_names, size=15, subset=range(72), cb
 
 
     if cbar:
-        plt.colorbar(im, ax=ax)
+        if cax is None:
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes("right", size="2%", pad=0.1)
+        plt.colorbar(im, cax=cax)  # https://stackoverflow.com/questions/46314646/change-matplotlib-colorbar-to-custom-height
+        cax.set_ylabel('region to region connectivity strength')
     if reverse_x:
         ax.invert_xaxis()
     if return_fig:
@@ -551,17 +555,23 @@ def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None, k
     # inds = np.where(np.logical_and(struct_mat > 0, struct_mat < 15))
     # funct_mat = funct_mat[inds]
     # struct_mat = struct_mat[inds]
+    print(funct_mat.shape)
 
-    inds = np.where(funct_mat < 1e-1)
+    inds = np.where(funct_mat > 1e-7)
+    print(len(inds), inds[0].shape)
     funct_mat  = funct_mat[inds]
     struct_mat = struct_mat[inds]
 
     inds = np.where(struct_mat > 1e-7)
+    print(len(inds), inds[0].shape)
     funct_mat  = funct_mat[inds]
     struct_mat = struct_mat[inds]
 
-    x_lim = (0.9 * struct_mat.min(), 1.1 * struct_mat.max())
-    y_lim = (0.9 * funct_mat.min(), 1.1 * funct_mat.max())
+    print(funct_mat.shape)
+
+    # x_lim = (0.9 * struct_mat.min(), 1.1 * struct_mat.max())
+    x_lim = (np.percentile(struct_mat, 4), np.percentile(struct_mat, 100))
+    y_lim = (np.percentile(funct_mat, 5), np.percentile(funct_mat, 100))
     #
     struct_mat_corr = struct_mat
     funct_mat_corr = funct_mat
@@ -591,3 +601,41 @@ def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None, k
     ax.set_ylim(y_lim)
     return (pearson, spearman)
     # ax.set_title('')
+
+def plot_multi_fish_connectivity_scatter(all_connections_tensor, fish_combinations=[(0, 1)],
+                                         ax=None, axis_lim=None):
+    if ax is None:
+        ax = plt.subplot(111)
+    plot_dens_1 = np.array([])  # save x axis
+    plot_dens_2 = np.array([])  # save y axis
+    plot_colours = np.array([])
+
+    for i_plot, fish_inds in enumerate(fish_combinations):  # collect data
+        tmp_dens_1 = np.log10(all_connections_tensor[: ,:, fish_inds[0]] + 1e-20).flatten()
+        tmp_dens_2 = np.log10(all_connections_tensor[: ,:, fish_inds[1]] + 1e-20).flatten()
+        plot_dens_1 = np.concatenate((plot_dens_1, tmp_dens_1))
+        plot_dens_2 = np.concatenate((plot_dens_2, tmp_dens_2))
+        plot_colours = np.concatenate((plot_colours, np.zeros_like(tmp_dens_1) + i_plot))  # int index for oclour
+    random_inds = np.random.choice(a=len(plot_colours), size=len(plot_colours), replace=False) # shuffle so points are mixed
+
+    ax.scatter(plot_dens_1[random_inds], plot_dens_2[random_inds], c=plot_colours[random_inds],
+                alpha=0.8, s=12)
+    ax.set_xlabel('Region to region connectivity Fish A\n(10-log scale)');
+    ax.set_ylabel('Region to region connectivity Fish B\n(10-log scale)');
+    if axis_lim is not None:
+        ax.set_xlim(axis_lim)
+        ax.set_ylim(axis_lim)
+        if axis_lim == [-6, -1.5]:
+            ax.set_xticks(np.arange(-6, -1))
+            ax.set_yticks(np.arange(-6, -1));
+
+    viridis = matplotlib.cm.get_cmap('viridis', len(fish_combinations))  # this is defaul tin scatter
+    handle_dict = [matplotlib.lines.Line2D([], [], marker='o',
+                                           c='white', markerfacecolor=viridis(i_plot)) for i_plot in range(len(fish_combinations))]
+    ax.legend(handles=handle_dict,
+              # labels=[f'A: #{str(x[0])}, B: #{str(x[1])}' for x in fish_combinations],
+              labels=[f'{str(x[0])}-{str(x[1])}' for x in fish_combinations],
+              frameon=False, loc='upper left', bbox_to_anchor=(-0.08, 1.07));
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    return ax
