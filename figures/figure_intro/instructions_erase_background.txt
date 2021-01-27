@@ -6,14 +6,20 @@ Global Opacity = 1.00
 inverted = True
 
 # plot & save colours in fishualizer:
-open data & all hus
+open data & all hus (sign swapped, no threshold for ALL, threshold for individual hus)
 in console: 
 self.tidy_up_viewboxes(reverse_x=True, draw_outlines=False, draw_crosses=False, draw_scale=False)
 self.add_scale_bar()
-self.draw_all_hus_from_path(overlap='max')  # to load old colours
+self.draw_all_hus_from_path(cluster_dict_file='colours_2021-01-22.pkl', overlap='max')  # to load old colours
 # self.draw_all_hus(overlap='max') # for new colours
+# swipe down side view
+self.view3D.opts['distance'] = 165
 
 ## to save colour dict:
 import pickle
 with open('/home/thijs/repos/zf-rbm/figures/figure_intro/colours_2021-01-13.pkl', 'wb') as f:
     pickle.dump(self.hu_colours, f)
+
+## to save indiviudal plot: 
+## first load all clusters (as above) and then deselect all & select only the relevant one(s)
+self.grab_plot(filename='/home/thijs/repos/zf-rbm/figures/figure_intro/hus_fig1_v2/all_hus_2021-01-26.png', include_view2D=False)

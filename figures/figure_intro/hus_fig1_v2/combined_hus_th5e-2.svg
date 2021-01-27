@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="combined_hus_th5e-2.svg">
+  <defs
+     id="defs2">
+    <filter
+       inkscape:label="Light Eraser"
+       style="color-interpolation-filters:sRGB;"
+       id="filter1063">
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 212.5 715.4 72.1 -0 0 "
+         result="colormatrix"
+         id="feColorMatrix1059" />
+      <feComposite
+         in2="colormatrix"
+         operator="arithmetic"
+         k2="1"
+         result="composite"
+         id="feComposite1061" />
+    </filter>
+    <filter
+       inkscape:label="Light Eraser"
+       style="color-interpolation-filters:sRGB;"
+       id="filter1069">
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 212.5 715.4 72.1 -0 0 "
+         result="colormatrix"
+         id="feColorMatrix1065" />
+      <feComposite
+         in2="colormatrix"
+         operator="arithmetic"
+         k2="1"
+         result="composite"
+         id="feComposite1067" />
+    </filter>
+    <filter
+       inkscape:label="Light Eraser"
+       style="color-interpolation-filters:sRGB;"
+       id="filter1075">
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 212.5 715.4 72.1 -0 0 "
+         result="colormatrix"
+         id="feColorMatrix1071" />
+      <feComposite
+         in2="colormatrix"
+         operator="arithmetic"
+         k2="1"
+         result="composite"
+         id="feComposite1073" />
+    </filter>
+    <filter
+       inkscape:label="Light Eraser"
+       style="color-interpolation-filters:sRGB;"
+       id="filter1081">
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 212.5 715.4 72.1 -0 0 "
+         result="colormatrix"
+         id="feColorMatrix1077" />
+      <feComposite
+         in2="colormatrix"
+         operator="arithmetic"
+         k2="1"
+         result="composite"
+         id="feComposite1079" />
+    </filter>
+    <filter
+       inkscape:label="Light Eraser"
+       style="color-interpolation-filters:sRGB;"
+       id="filter1087">
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 212.5 715.4 72.1 -0 0 "
+         result="colormatrix"
+         id="feColorMatrix1083" />
+      <feComposite
+         in2="colormatrix"
+         operator="arithmetic"
+         k2="1"
+         result="composite"
+         id="feComposite1085" />
+    </filter>
+    <filter
+       inkscape:label="Light Eraser"
+       style="color-interpolation-filters:sRGB;"
+       id="filter1093">
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 212.5 715.4 72.1 -0 0 "
+         result="colormatrix"
+         id="feColorMatrix1089" />
+      <feComposite
+         in2="colormatrix"
+         operator="arithmetic"
+         k2="1"
+         result="composite"
+         id="feComposite1091" />
+    </filter>
+    <filter
+       inkscape:label="Light Eraser"
+       style="color-interpolation-filters:sRGB;"
+       id="filter1099">
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 212.5 715.4 72.1 -0 0 "
+         result="colormatrix"
+         id="feColorMatrix1095" />
+      <feComposite
+         in2="colormatrix"
+         operator="arithmetic"
+         k2="1"
+         result="composite"
+         id="feComposite1097" />
+    </filter>
+    <filter
+       inkscape:label="Light Eraser"
+       style="color-interpolation-filters:sRGB;"
+       id="filter1105">
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 212.5 715.4 72.1 -0 0 "
+         result="colormatrix"
+         id="feColorMatrix1101" />
+      <feComposite
+         in2="colormatrix"
+         operator="arithmetic"
+         k2="1"
+         result="composite"
+         id="feComposite1103" />
+    </filter>
+    <filter
+       inkscape:label="Light Eraser"
+       style="color-interpolation-filters:sRGB;"
+       id="filter1271">
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 212.5 715.4 72.1 -0 0 "
+         result="colormatrix"
+         id="feColorMatrix1267" />
+      <feComposite
+         in2="colormatrix"
+         operator="arithmetic"
+         k2="1"
+         result="composite"
+         id="feComposite1269" />
+    </filter>
+    <filter
+       inkscape:label="Light Eraser"
+       style="color-interpolation-filters:sRGB;"
+       id="filter1277">
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 212.5 715.4 72.1 -0 0 "
+         result="colormatrix"
+         id="feColorMatrix1273" />
+      <feComposite
+         in2="colormatrix"
+         operator="arithmetic"
+         k2="1"
+         result="composite"
+         id="feComposite1275" />
+    </filter>
+    <filter
+       inkscape:label="Light Eraser"
+       style="color-interpolation-filters:sRGB;"
+       id="filter1283">
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 212.5 715.4 72.1 -0 0 "
+         result="colormatrix"
+         id="feColorMatrix1279" />
+      <feComposite
+         in2="colormatrix"
+         operator="arithmetic"
+         k2="1"
+         result="composite"
+         id="feComposite1281" />
+    </filter>
+    <filter
+       inkscape:label="Light Eraser"
+       style="color-interpolation-filters:sRGB;"
+       id="filter1289">
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 212.5 715.4 72.1 -0 0 "
+         result="colormatrix"
+         id="feColorMatrix1285" />
+      <feComposite
+         in2="colormatrix"
+         operator="arithmetic"
+         k2="1"
+         result="composite"
+         id="feComposite1287" />
+    </filter>
+    <filter
+       inkscape:label="Light Eraser"
+       style="color-interpolation-filters:sRGB;"
+       id="filter1295">
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 212.5 715.4 72.1 -0 0 "
+         result="colormatrix"
+         id="feColorMatrix1291" />
+      <feComposite
+         in2="colormatrix"
+         operator="arithmetic"
+         k2="1"
+         result="composite"
+         id="feComposite1293" />
+    </filter>
+    <filter
+       inkscape:label="Light Eraser"
+       style="color-interpolation-filters:sRGB;"
+       id="filter1301">
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 212.5 715.4 72.1 -0 0 "
+         result="colormatrix"
+         id="feColorMatrix1297" />
+      <feComposite
+         in2="colormatrix"
+         operator="arithmetic"
+         k2="1"
+         result="composite"
+         id="feComposite1299" />
+    </filter>
+    <filter
+       inkscape:label="Light Eraser"
+       style="color-interpolation-filters:sRGB;"
+       id="filter1307">
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 212.5 715.4 72.1 -0 0 "
+         result="colormatrix"
+         id="feColorMatrix1303" />
+      <feComposite
+         in2="colormatrix"
+         operator="arithmetic"
+         k2="1"
+         result="composite"
+         id="feComposite1305" />
+    </filter>
+    <filter
+       inkscape:label="Light Eraser"
+       style="color-interpolation-filters:sRGB;"
+       id="filter1313">
+      <feColorMatrix
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 212.5 715.4 72.1 -0 0 "
+         result="colormatrix"
+         id="feColorMatrix1309" />
+      <feComposite
+         in2="colormatrix"
+         operator="arithmetic"
+         k2="1"
+         result="composite"
+         id="feComposite1311" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="3294.2692"
+     inkscape:cy="-1751.1512"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1025"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:measure-start="0,0"
+     inkscape:measure-end="0,0" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <image
+       sodipodi:absref="/home/thijs/repos/zf-rbm/figures/figure_intro/hus_fig1_v2/hu_122_th5e-2.png"
+       xlink:href="hu_122_th5e-2.png"
+       style="filter:url(#filter1307)"
+       width="468.3125"
+       height="228.86458"
+       preserveAspectRatio="none"
+       id="image1198"
+       x="442.74954"
+       y="656.7962" />
+    <image
+       sodipodi:absref="/home/thijs/repos/zf-rbm/figures/figure_intro/hus_fig1_v2/hu_135_th5e-2.png"
+       xlink:href="hu_135_th5e-2.png"
+       style="filter:url(#filter1301)"
+       width="468.3125"
+       height="228.86458"
+       preserveAspectRatio="none"
+       id="image1209"
+       x="574.19403"
+       y="741.76294" />
+    <image
+       sodipodi:absref="/home/thijs/repos/zf-rbm/figures/figure_intro/hus_fig1_v2/hu_158_th5e-2.png"
+       xlink:href="hu_158_th5e-2.png"
+       style="filter:url(#filter1295)"
+       width="468.3125"
+       height="228.86458"
+       preserveAspectRatio="none"
+       id="image1220"
+       x="710.78424"
+       y="621.02008" />
+    <image
+       sodipodi:absref="/home/thijs/repos/zf-rbm/figures/figure_intro/hus_fig1_v2/hu_159_th5e-2.png"
+       xlink:href="hu_159_th5e-2.png"
+       style="filter:url(#filter1289)"
+       width="468.3125"
+       height="228.86458"
+       preserveAspectRatio="none"
+       id="image1231"
+       x="436.93951"
+       y="758.37164" />
+    <image
+       sodipodi:absref="/home/thijs/repos/zf-rbm/figures/figure_intro/hus_fig1_v2/hu_162_th5e-2.png"
+       xlink:href="hu_162_th5e-2.png"
+       style="filter:url(#filter1283)"
+       width="468.3125"
+       height="228.86458"
+       preserveAspectRatio="none"
+       id="image1242"
+       x="475.15741"
+       y="545.96069" />
+    <image
+       sodipodi:absref="/home/thijs/repos/zf-rbm/figures/figure_intro/hus_fig1_v2/hu_171_th5e-2.png"
+       xlink:href="hu_171_th5e-2.png"
+       style="filter:url(#filter1277)"
+       width="468.3125"
+       height="228.86458"
+       preserveAspectRatio="none"
+       id="image1253"
+       x="628.23779"
+       y="555.0321" />
+    <image
+       sodipodi:absref="/home/thijs/repos/zf-rbm/figures/figure_intro/hus_fig1_v2/hu_194_th5e-2.png"
+       xlink:href="hu_194_th5e-2.png"
+       style="filter:url(#filter1271)"
+       width="468.3125"
+       height="228.86458"
+       preserveAspectRatio="none"
+       id="image1264"
+       x="684.9342"
+       y="728.90118" />
+    <rect
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.57252192;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect1315"
+       width="32.408817"
+       height="1.1886566"
+       x="1009.7286"
+       y="905.48358"
+       ry="0.48992616"
+       rx="0" />
+    <g
+       id="g1329">
+      <image
+         sodipodi:absref="/home/thijs/repos/zf-rbm/figures/figure_intro/hus_fig1_v2/all_hus_2021-01-26.png"
+         xlink:href="all_hus_2021-01-26.png"
+         y="658.71564"
+         x="530.48767"
+         id="image1187"
+         preserveAspectRatio="none"
+         height="228.86458"
+         width="468.3125"
+         style="filter:url(#filter1313)" />
+      <rect
+         ry="9.8273811"
+         rx="31.37191"
+         y="702.56842"
+         x="628.95239"
+         height="9.8273811"
+         width="47.625"
+         id="rect1325"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.57200003;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    </g>
+  </g>
+</svg>

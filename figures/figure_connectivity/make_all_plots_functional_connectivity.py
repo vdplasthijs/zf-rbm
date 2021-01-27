@@ -11,7 +11,7 @@ sys.path.append('../')
 import seaborn as sns
 
 
-version = '4'
+version = '5'
 
 env = pickle.load(open('/home/iscb/wolfson/jeromet/Data/Neuro/connectivity_plot_files_v%s.data'%version,'rb'))
 
@@ -29,7 +29,7 @@ There are various Baier matrices:
 - the ones I rederived from his new data.
 All viz are made with 'my_new_normalized_by_volume', but we can change at last stage if needed.
 '''
-selected_connectivity_type = 'my_new_normalized_by_volume'
+selected_connectivity_type = 'his_old'
 connectivity_baier = env['connectivity_baier'] # The selected one.
 all_baier_connectivities = env['all_baier_connectivities'] # All others.
 connectivity_types = list(all_baier_connectivities.keys()) 
@@ -267,7 +267,7 @@ if (make_run_plots| make_method_plots):
                 pearson = np.corrcoef(flat_target, flat_prediction)[0, 1]
 
                 key = correlation_averaged_connectivity_key_format.format(
-                    method=method, aggregation=aggregation,connectivity_type=selected_connectivity_type)
+                    method=method, aggregation=aggregation,connectivity_type=connectivity_type)
                 all_spearman_averaged[key] = spearman
                 all_pearson_averaged[key] = pearson
 
@@ -319,7 +319,7 @@ if make_method_plots:
         key_matrix = averaged_connectivity_key_format.format(
             method=method, aggregation=selected_aggregation)
         key_correlation = correlation_averaged_connectivity_key_format.format(
-            method=method, aggregation=selected_aggregation,connectivity_type=connectivity_type)
+            method=method, aggregation=selected_aggregation,connectivity_type=selected_connectivity_type)
 
         prediction = all_averaged_functional_connectivities[key_matrix]
         spearman = all_spearman_averaged[key_correlation]

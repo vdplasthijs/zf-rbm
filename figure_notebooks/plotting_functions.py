@@ -451,10 +451,11 @@ def plot_one_stat(density, xbins, ybins, title='', ax=None):
     return ax
 
 def plot_connectivity_matrix(matrix, region_names, size=15, subset=range(72),
-                             cbar=False, cax=None,
+                             cbar=False, cax=None, cmap='jet',
                              scale_limits=True, ax=None, region_order_dict=None,
                              plot_log=False, reverse_x=True, plot_labels=True,
-                             mini=None, maxi=None):
+                             mini=None, maxi=None, fill_zeros_with_min=False,
+                             fill_nans_with_min=False):
     if ax is None:
         return_fig = True
         fig, ax = plt.subplots()
@@ -483,28 +484,47 @@ def plot_connectivity_matrix(matrix, region_names, size=15, subset=range(72),
         matrix_use = matrix[subset, :][:, subset]
         region_names_use = [region_names[x] for x in subset]
 
-    if scale_limits:
-        # off_diagonal = 1 - np.eye(len(subset))
-        # off_diagonal = off_diagonal.astype(np.bool)
-        # matrix_use = matrix_use[off_diagonal]
-        # maxi = 3 * np.sqrt(np.nanmean(matrix_use**2))
-        for i_scale in range(2):  # need the loop because we need to add mini to matrix andd then re estimate in case of log
-            tmp = matrix_use[np.logical_not(np.isnan(matrix_use))]
-            tmp = tmp[np.where(tmp != 0)]  # because these ruin logs
-            if mini is None:
-                mini = np.percentile(tmp, 10)
-                if i_scale == 0:  # add for log taking
-                    matrix_use += 0.1 * mini
-                    mini = None # for next it
-            if maxi is None and i_scale == 1:
-                maxi = np.percentile(tmp, 95)
-            if i_scale == 0:
-                if plot_log:
-                    matrix_use = np.log10(matrix_use)
-    else:
+    if scale_limits and (mini is None or maxi is None):  # automatically set mini and/or maxi if needed
+        assert matrix_use.min() >= 0
         if plot_log:
-            matrix_use = np.log10(matrix_use)
-    im = ax.imshow(matrix_use, vmin=mini, vmax=maxi, cmap='jet')
+            mini = np.percentile(np.log10(matrix_use[matrix_use > 0]), 10)
+            maxi = np.percentile(np.log10(matrix_use[matrix_use > 0]), 99.5)
+            # maxi = np.max(np.log10(matrix_use[matrix_use > 0]))
+        else:
+            mini = np.percentile(matrix_use[matrix_use > 0], 1)
+            maxi = np.percentile(matrix_use[matrix_use > 0], 99)
+
+        # for i_scale in range(2):  # need the loop because we need to add mini to matrix andd then re estimate in case of log
+        #     tmp = matrix_use[np.logical_not(np.isnan(matrix_use))]
+        #     tmp = tmp[np.where(tmp != 0)]  # because these ruin logs
+        #     if mini is None:
+        #         mini = np.percentile(tmp, 10)
+        #         if i_scale == 0:  # add for log taking
+        #             matrix_use += 0.1 * mini
+        #             mini = None # for next it
+        #     if maxi is None and i_scale == 1:
+        #         maxi = np.percentile(tmp, 95)
+        #     if i_scale == 0:
+        #         if plot_log:
+        #             matrix_use = np.log10(matrix_use)
+    # else:
+    if fill_zeros_with_min:
+        assert np.nanmin(matrix_use) >= 0, f'min matrix is {np.nanmin(matrix_use)}'
+        matrix_use[np.where(matrix_use == 0)] = np.nanmin(matrix_use[matrix_use > 0])
+
+    if fill_nans_with_min:
+        assert np.nanmin(matrix_use) >= 0, f'min matrix is {np.nanmin(matrix_use)}'
+        matrix_use[np.isnan(matrix_use)] = np.nanmin(matrix_use[matrix_use > 0])
+
+    if plot_log:
+        matrix_use = np.log10(matrix_use)
+
+    if cmap == 'sparsity':
+        cmap_matrix = sns.cubehelix_palette(start=0.25, rot=-1, dark=0., light=0.9, reverse=True, as_cmap=True, n_colors=10)
+        # cmap_matrix = sns.cubehelix_palette(start=0.25, rot=-1, dark=0.25, light=1, reverse=True, as_cmap=True, n_colors=10)  # used in sparsity fig
+    else:
+        cmap_matrix = cmap
+    im = ax.imshow(matrix_use, vmin=mini, vmax=maxi, cmap=cmap_matrix)
     if plot_labels:
         ax.set_xticks(range(len(subset)))
         ax.set_xticklabels(region_names_use, rotation=90, fontsize=6)
@@ -544,44 +564,55 @@ def plot_distr(mat, min_th=1e-8):
 
     ax_log.hist(np.log10(mat[np.where(mat != 0)].flatten()), bins=50)
 
-def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None, key=None):
+def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None,
+                         key=None, compute_in_log=False, fill_diag=False,
+                         filter_zeros=False, set_limits=True, title='general'):
     if ax is None:
         ax = plt.subplot(111)
     assert struct_mat.shape == funct_mat.shape
     struct_mat = struct_mat[subset, :][:, subset]
     funct_mat = funct_mat[subset, :][:, subset]
-    # struct_mat = struct_mat.flatten() + 1e-12
-    # funct_mat = funct_mat.flatten()  +1e-12
-    # inds = np.where(np.logical_and(struct_mat > 0, struct_mat < 15))
-    # funct_mat = funct_mat[inds]
-    # struct_mat = struct_mat[inds]
-    print(funct_mat.shape)
 
-    inds = np.where(funct_mat > 1e-7)
-    print(len(inds), inds[0].shape)
-    funct_mat  = funct_mat[inds]
-    struct_mat = struct_mat[inds]
+    if fill_diag:
+        struct_mat[np.arange(len(struct_mat)), np.arange(
+            len(struct_mat))] += 1.0 * struct_mat.max()  # They did not define a diagonal connexion (intra-region connectivity). Set to the maximum value across all entry.
 
-    inds = np.where(struct_mat > 1e-7)
-    print(len(inds), inds[0].shape)
-    funct_mat  = funct_mat[inds]
-    struct_mat = struct_mat[inds]
 
-    print(funct_mat.shape)
+    struct_mat = struct_mat.flatten()
+    funct_mat = funct_mat.flatten()
 
-    # x_lim = (0.9 * struct_mat.min(), 1.1 * struct_mat.max())
-    x_lim = (np.percentile(struct_mat, 4), np.percentile(struct_mat, 100))
-    y_lim = (np.percentile(funct_mat, 5), np.percentile(funct_mat, 100))
+    if filter_zeros:
+        print(funct_mat.shape)
+
+        inds = np.where(funct_mat > 0)
+        print(len(inds), inds[0].shape)
+        funct_mat  = funct_mat[inds]
+        struct_mat = struct_mat[inds]
+
+        inds = np.where(struct_mat > 0)
+        print(len(inds), inds[0].shape)
+        funct_mat  = funct_mat[inds]
+        struct_mat = struct_mat[inds]
+
+        print(funct_mat.shape)
+
+    if set_limits:
+        # x_lim = (np.percentile(struct_mat, 10), np.percentile(struct_mat, 99.5))
+        # y_lim = (np.percentile(funct_mat, 10), np.percentile(funct_mat, 99.5))
+        x_lim = (0.9 * np.min(struct_mat), np.max(struct_mat) * 1.1)
+        y_lim = (0.9 * np.min(funct_mat), funct_mat.max() * 1.1)
+        # y_lim = (0.9 * np.sort(funct_mat)[4], funct_mat.max() * 1.1)
     #
-    struct_mat_corr = struct_mat
-    funct_mat_corr = funct_mat
+    if compute_in_log:
+        struct_mat_corr = np.log10(struct_mat)
+        funct_mat_corr = np.log10(funct_mat)
+    else:
+        struct_mat_corr = struct_mat
+        funct_mat_corr = funct_mat
 
-    # struct_mat_corr = np.log10(struct_mat)
-    # funct_mat_corr = np.log10(funct_mat)
-
-    pearson = np.corrcoef(struct_mat_corr, funct_mat_corr)[1, 0]
-    spearman = scipy.stats.spearmanr(struct_mat_corr, funct_mat_corr).correlation
-    print(key, pearson, spearman)
+    pearson, p_val_pearson = scipy.stats.pearsonr(struct_mat_corr, funct_mat_corr)
+    spearman, p_val_spearman = scipy.stats.spearmanr(struct_mat_corr, funct_mat_corr)
+    print(key, 'Pearson:' , pearson, ', Spearman: ', spearman)
     if key.lower() in dr_colors.keys():
         color_dots = dr_colors[key.lower()]
     else:
@@ -590,17 +621,24 @@ def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None, k
     ax.set_xscale('log')
     ax.scatter(struct_mat, funct_mat, color=color_dots, s=10)
     # sns.jointplot(struct_mat, funct_mat, ax=ax)
-    ax.set_xlabel('Structural connectivity (log)')
-    ax.set_ylabel('Functional connectivity (log)')
+    ax.set_xlabel('Structural connectivity\n(10-log scale)')
+    ax.set_ylabel('Functional connectivity\n(10-log scale)')
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
-    ax.set_title(f'Structural vs functional connectivity\nr = {np.round(spearman, 2)}',
-                 fontdict={'weight': 'bold'})
 
-    ax.set_xlim(x_lim)
-    ax.set_ylim(y_lim)
+    if title == 'specific':
+        print(p_val_spearman)
+        sci_not = np.format_float_scientific(p_val_spearman, precision=3)
+        sci_exp_ceil = int(sci_not.split('e')[1]) + 1
+        ax.set_title(f'{key} vs structural connectivity\nr = {np.round(spearman, 2)}, P < 10^{sci_exp_ceil}',
+                        fontdict={'weight': 'bold'})
+    else:
+        ax.set_title(f'Structural vs functional connectivity\nr = {np.round(spearman, 2)}',
+                     fontdict={'weight': 'bold'})
+    if set_limits:
+        ax.set_xlim(x_lim)
+        ax.set_ylim(y_lim)
     return (pearson, spearman)
-    # ax.set_title('')
 
 def plot_multi_fish_connectivity_scatter(all_connections_tensor, fish_combinations=[(0, 1)],
                                          ax=None, axis_lim=None):
@@ -620,8 +658,8 @@ def plot_multi_fish_connectivity_scatter(all_connections_tensor, fish_combinatio
 
     ax.scatter(plot_dens_1[random_inds], plot_dens_2[random_inds], c=plot_colours[random_inds],
                 alpha=0.8, s=12)
-    ax.set_xlabel('Region to region connectivity Fish A\n(10-log scale)');
-    ax.set_ylabel('Region to region connectivity Fish B\n(10-log scale)');
+    ax.set_xlabel('Region to region connectivity\n in Fish A (10-log scale)');
+    ax.set_ylabel('Region to region connectivity\n in Fish B (10-log scale)');
     if axis_lim is not None:
         ax.set_xlim(axis_lim)
         ax.set_ylim(axis_lim)
