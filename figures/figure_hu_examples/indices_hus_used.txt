@@ -3,17 +3,53 @@ Threshold = 0.1
 dynamic / intrinsic HU index
 
 Groups:
-TSC: 129/198, 124/22
-maybe use; 191/157, 148/89 (both more anat. aligned with counterpart it seems)
+TSC: 191/157, 124/22, 87/60, 38/165
+maybe use; 129/198, 148/89 (both more anat. aligned with counterpart it seems)
+regions:90? (Statoac), 237 (Tang Vest), 234 (Spinal backfill Vest), 109 (TSC)
 
 SC: 61/194, 68/93, 69/15
+224 ( Rh 7), 259 (SC)
 
 Cb: 97/92, 188/44, 173/128, 91/59
+regions: 130 (Cb)
 
-OT: 
+OT: 1, 6, 10, 17, 38, 43, 64, 82, 88, 108, 113, 135, 160, 162, 164, 168, 174, 188
+(get list with [int(v[0][-3:]) for v in self.cl_colors.values() if v[2] == 1])
+105 (tectum Str Periventri)
+
+----------------
 
 
-Individual examples:
+New individual examples:
+
+dynamic / intrinsic HU index
+
+E: 78/57 ARTR-left => slow antiphasic activity (wrt ARTR right)
+regions: 219 (Rh 2)
+
+F: 45/83 ARTR-right => slow antiphasic activity (wrt ARTR left)
+
+regions: 219 (Rh 2)
+
+G: 43/77 nIII -> saccade circuit? => slow state changes (with ARTR right)
+regions: 97 (Oc Mot nIII - Anterior), 238 (VII Facial motor, octavolat. efferent - posterior), 223 (Rh6 - large one), 
+
+H: 157/159 Telencephalon + Hindbrain cluster 
+regions: 246 (Rh Vglut2 Cl 1 - middle), 292 (Te Vglut2 rind - ant), 258 (Rh X vagus - post)
+regions maybe: 282? (Pallium), 
+
+I: 68/93 Spinal cord ; RS neurons ; two symmetric nice clusters ; purkinje cells ? => spiking activity
+regions: 250 (Vmat2 Cl 1, smaller middle), 148 (Gad1b Cl 4 - larger, A), 262 (SC Gad1b Str 1 - P), , 131 (Cb Gad1b enrich - A), 155 (Gad1b Str 2 - 2nd P)
+regions maybe: 130 (cb), 258? (X Vagus motor), 232? (S1181t Cl), 219? (Rh 2), 203? (Olig2 enrich Cb)
+
+J: 59/153 nV + Isl1 motor neurons + Spinal cord + nice clusters at midbrain-hindbrain boundary  => related to behaviour?
+regions: , 212 (Post nV Trigem - bottom of Cb, middle), 130 (Cb - A),  148 (Gad1bn Cl 4, 2nd A, high), 262 (SC Gad1b Str 1 - P), 55 (Gad1b Str 2 - 2nd P)
+regions maybe: 123 (Ant nV Trigem), 265 (Isl1 str), 270 (SC Vglut2, St 2), 224 (Rh 7), 
+
+------------
+
+
+Old individual examples:
 
 dynamic / intrinsic HU index
 
@@ -28,6 +64,12 @@ H: 157/159 Tel-Rhomb assembly
 I: 59/153
 
 J: 122/112
+
+
+I: 87/60 statoacoustic ganglion; tangential vestibular nucleus; RS vestibular population => slow decay activity 
+regions: 90? (Statoac), 237? (Tang Vest), 197 (Neuropil 5), 234 (Spinal backfill Vest)
+
+---------------
 
 
 Alternatives:

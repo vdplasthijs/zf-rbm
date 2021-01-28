@@ -1,0 +1,23 @@
+Fishualizer
+
+Load data 
+Load HUs (threshold for groups at 0.1, do not threshold for individual)
+Open console
+
+self.tidy_up_viewboxes(reverse_x=True, draw_outlines=True, draw_crosses=False, draw_scale=False)
+## click HU view mode   # this does NOT reverse x 
+## drag out slider between viewboxes just a little bit so that both are fully shown 
+self.add_scale_bar()  # optional, for first one or something 
+## set view to additive for indiviudals
+self.draw_all_hus_from_path(cluster_dict_file='colours_2021-01-22.pkl')  # for groups
+
+## HUs are indexed by 'internal index'.
+
+## To draw region outlines (except for full outlines):
+self.draw_main_region_outlines(main_regions_inds=[82, 86], remove_all_other_regions=True)
+
+## get back cell selection orb by 
+self.select_3D.show()
+
+# to get curretnly selected clustsers:
+[v[0] for v in self.cl_colors.values() if v[2] == 1]
