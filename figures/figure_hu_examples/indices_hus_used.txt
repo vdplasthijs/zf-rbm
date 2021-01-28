@@ -1,0 +1,37 @@
+Threshold = 0.1
+
+dynamic / intrinsic HU index
+
+Groups:
+TSC: 129/198, 124/22
+maybe use; 191/157, 148/89 (both more anat. aligned with counterpart it seems)
+
+SC: 61/194, 68/93, 69/15
+
+Cb: 97/92, 188/44, 173/128, 91/59
+
+OT: 
+
+
+Individual examples:
+
+dynamic / intrinsic HU index
+
+E: 78/57 ARTR-right 
+
+F: 45/83 ARTR-left
+
+G: 158/122 Forebrain assembly
+
+H: 157/159 Tel-Rhomb assembly
+
+I: 59/153
+
+J: 122/112
+
+
+Alternatives:
+
+fast spiking HUs: 67/182, 68/93, 69/15 (all visually sparse kind of version of 59/153 (I)
+
+slow state changes: 2/156, 35/170 (also bi-sign), 
