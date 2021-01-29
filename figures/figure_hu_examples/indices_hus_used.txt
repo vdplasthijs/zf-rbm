@@ -24,12 +24,13 @@ New individual examples:
 
 dynamic / intrinsic HU index
 
-E: 78/57 ARTR-left => slow antiphasic activity (wrt ARTR right)
+E: 45/83 ARTR-right => slow antiphasic activity (wrt ARTR left)
 regions: 219 (Rh 2)
 
-F: 45/83 ARTR-right => slow antiphasic activity (wrt ARTR left)
-
+F: 78/57 ARTR-left => slow antiphasic activity (wrt ARTR right)
 regions: 219 (Rh 2)
+
+
 
 G: 43/77 nIII -> saccade circuit? => slow state changes (with ARTR right)
 regions: 97 (Oc Mot nIII - Anterior), 238 (VII Facial motor, octavolat. efferent - posterior), 223 (Rh6 - large one), 

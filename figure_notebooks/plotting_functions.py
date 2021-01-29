@@ -36,7 +36,8 @@ plt.rcParams['axes.prop_cycle'] = cycler(color=sns.color_palette('colorblind'))
 
 dr_legend = {'pca': 'PCA', 'rbm': 'RBM', 'fa': 'FA', 'ica': 'ICA', 'glm': 'GLM'}
 dr_colors = {'glm': '#008B8B', 'pca': '#808000', 'rbm': '#800080', 'fa': 'red', 'ica':'#157bf9'}
-
+dr_names = {'rbm': 'cRBM', 'RBM': 'cRBM', 'pca': 'PCA', 'PCA': 'PCA',
+            'covariance': 'covariance', 'correlation': 'correlation'}
 def set_fontsize(font_size=12):
     plt.rcParams['font.size'] = font_size
     plt.rcParams['axes.autolimit_mode'] = 'data' # default: 'data'
@@ -389,20 +390,33 @@ def plot_binned_stats(ax, plot_bins, mean_bins, std_bins, comp_moment=None):
     ax.set_ylim([plot_bins.min(), plot_bins.max()])
     return ax
 
-def plot_reproduc_mat(dict_mat, key, ax=None, corr_type='pearson'):
+def plot_reproduc_mat(dict_mat, key, ax=None, corr_type='pearson',
+                      one_indexing_labels=True, plot_diag=True):
     if ax is None:
         ax = plt.subplot(111)
     data = dict_mat[key][corr_type]
     mask = np.zeros_like(data)
-    mask[np.triu_indices_from(data, k=0)] = True
+    if plot_diag:
+        mask[np.triu_indices_from(data, k=1)] = True
+    else:
+        mask[np.triu_indices_from(data, k=0)] = True
     sns.heatmap(data, annot=False, ax=ax, square=True, mask=mask, vmin=0, vmax=1,
+                linewidths=0, rasterized=True,
                 cmap='pink_r', cbar_kws={'label': f'{corr_type[0].upper() + corr_type[1:]} correlation'})
     ax.set_xlabel('# Fish')
     ax.set_ylabel('# Fish')
-    ax.set_xticks(np.arange(len(data) - 1) + 0.5)
-    ax.set_yticks(np.arange(1, len(data)) + 0.5)
-    ax.set_xticklabels([str(x + 0) for x in range(len(data))])
-    ax.set_yticklabels([str(x + 1) for x in range(len(data))])
+    if plot_diag:
+        ax.set_xticks(np.arange(len(data)) + 0.5)
+        ax.set_yticks(np.arange(len(data)) + 0.5)
+    else:
+        ax.set_xticks(np.arange(len(data) - 1) + 0.5)
+        ax.set_yticks(np.arange(1, len(data)) + 0.5)
+    if one_indexing_labels:
+        ax.set_xticklabels([str(x + 1) for x in range(len(data))])
+        ax.set_yticklabels([str(x + 1) for x in range(len(data))])
+    else:
+        ax.set_xticklabels([str(x + 0) for x in range(len(data))])
+        ax.set_yticklabels([str(x + 1) for x in range(len(data))])
     bottom, top = ax.get_ylim()
     ax.set_ylim(bottom + 0.5, top - 0.5);
     ax.set_title('Similarity between individual fish', fontdict={'weight': 'bold'})
@@ -544,7 +558,7 @@ def plot_connectivity_matrix(matrix, region_names, size=15, subset=range(72),
             divider = make_axes_locatable(ax)
             cax = divider.append_axes("right", size="2%", pad=0.1)
         plt.colorbar(im, cax=cax)  # https://stackoverflow.com/questions/46314646/change-matplotlib-colorbar-to-custom-height
-        cax.set_ylabel('region to region connectivity strength')
+        cax.set_ylabel('region to region connectivity strength\n(10-log scale)')
     if reverse_x:
         ax.invert_xaxis()
     if return_fig:
@@ -630,7 +644,7 @@ def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None,
         print(p_val_spearman)
         sci_not = np.format_float_scientific(p_val_spearman, precision=3)
         sci_exp_ceil = int(sci_not.split('e')[1]) + 1
-        ax.set_title(f'{key} vs structural connectivity\nr = {np.round(spearman, 2)}, P < 10^{sci_exp_ceil}',
+        ax.set_title(f'{dr_names[key]} vs structural connectivity\nr = {np.round(spearman, 2)}, P < 10^{sci_exp_ceil}',
                         fontdict={'weight': 'bold'})
     else:
         ax.set_title(f'Structural vs functional connectivity\nr = {np.round(spearman, 2)}',
@@ -641,7 +655,7 @@ def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None,
     return (pearson, spearman)
 
 def plot_multi_fish_connectivity_scatter(all_connections_tensor, fish_combinations=[(0, 1)],
-                                         ax=None, axis_lim=None):
+                                         ax=None, axis_lim=None, one_indexing_labels=True):
     if ax is None:
         ax = plt.subplot(111)
     plot_dens_1 = np.array([])  # save x axis
@@ -670,9 +684,13 @@ def plot_multi_fish_connectivity_scatter(all_connections_tensor, fish_combinatio
     viridis = matplotlib.cm.get_cmap('viridis', len(fish_combinations))  # this is defaul tin scatter
     handle_dict = [matplotlib.lines.Line2D([], [], marker='o',
                                            c='white', markerfacecolor=viridis(i_plot)) for i_plot in range(len(fish_combinations))]
+    if one_indexing_labels:
+        legend_labels = [f'{str(x[0] + 1)}-{str(x[1] + 1)}' for x in fish_combinations]
+    else:
+        legend_labels = [f'{str(x[0])}-{str(x[1])}' for x in fish_combinations]
     ax.legend(handles=handle_dict,
               # labels=[f'A: #{str(x[0])}, B: #{str(x[1])}' for x in fish_combinations],
-              labels=[f'{str(x[0])}-{str(x[1])}' for x in fish_combinations],
+              labels=legend_labels,
               frameon=False, loc='upper left', bbox_to_anchor=(-0.08, 1.07));
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
