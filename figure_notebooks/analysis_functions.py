@@ -9,8 +9,12 @@ import numpy as np
 from tqdm import tqdm
 import pandas as pd
 import matplotlib.pyplot as plt
-import scipy.spatial, scipy.cluster
+import scipy.spatial, scipy.cluster, scipy.sparse
 from sklearn.mixture import GaussianMixture
+import math, pickle, os, sys, gc
+import swap_sign_RBM as ssrbm
+sys.path.append('/home/thijs/repos/dnp-code/') # PGM3_correct/source/
+from fishualizer_utilities import Zecording
 
 def opt_leaf(w_mat, dim=0):
     '''create optimal leaf order over dim, of matrix w_mat. if w_mat is not an
@@ -405,3 +409,157 @@ def compute_median_discretised_state_occupancy(activity_mat, frequency=1, margin
         count_bursts[mu] = len(list_burst_durations)
 
     return median_silence_duration, median_burst_duration, median_period_duration, count_bursts
+
+
+def kstest(datalist1, datalist2):
+    '''An additional KS test:
+    ( because the scipy.stats gives the same P value for all 3, for some reason)
+    computing with this one gives the sam statisitcs, but lower P values which slightly difer.
+    I therefore think its a rounding error so its fine.
+    https://gist.github.com/devries/1140510
+    '''
+    n1 = len(datalist1)
+    n2 = len(datalist2)
+    datalist1.sort()
+    datalist2.sort()
+
+    j1 = 0
+    j2 = 0
+    d = 0.0
+    fn1=0.0
+    fn2=0.0
+    while j1<n1 and j2<n2:
+        d1 = datalist1[j1]
+        d2 = datalist2[j2]
+        if d1 <= d2:
+            fn1 = (float(j1)+1.0)/float(n1)
+            j1+=1
+        if d2 <= d1:
+            fn2 = (float(j2)+1.0)/float(n2)
+            j2+=1
+        dtemp = math.fabs(fn2-fn1)
+        if dtemp>d:
+            d=dtemp
+
+    ne = float(n1*n2)/float(n1+n2)
+    nesq = math.sqrt(ne)
+    prob = ksprob((nesq+0.12+0.11/nesq)*d)
+    return d,prob,ne
+
+def ksprob(alam):
+    '''An additional KS test:
+    ( because the scipy.stats gives the same P value for all 3, for some reason)
+    computing with this one gives the sam statisitcs, but lower P values which slightly difer.
+    I therefore think its a rounding error so its fine.
+    https://gist.github.com/devries/11405101
+    '''
+    fac = 2.0
+    sum = 0.0
+    termbf = 0.0
+
+    a2 = -2.0*alam*alam
+    for j in range(1,101):
+        term = fac*math.exp(a2*j*j)
+        sum += term
+        if math.fabs(term) <= 0.001*termbf or math.fabs(term) <= 1.0e-8*sum:
+            return sum
+        fac = -fac
+        termbf = math.fabs(term)
+
+    return 1.0
+
+def get_neural_data(dir_path, file_path):
+    full_path = os.path.join(dir_path, file_path)
+    rec = Zecording(path=full_path, kwargs={'ignorelags': True,
+                                              'forceinterpolation': False,
+                                              'ignoreunknowndata': True,# 'parent': self,
+                                              'loadram': True})  # load data
+    print(rec)
+    regions = {#'rh1': np.array([218]), 'rhall': np.array([113]),
+              'wb': np.arange(294)}
+    selected_neurons = {}
+    n_sel_cells = {}
+#     train_data = {}
+#     test_data = {}
+    full_data = {}
+
+#     dict_tt_inds = pickle.load(open(train_inds_path, 'rb'))  # load dictionary with training indices
+#     train_inds = dict_tt_inds['train_inds']  # load training inds, note that: # test_inds = dict_tt_inds['test_inds']
+#     test_inds = dict_tt_inds['test_inds']
+#     print(f'len test inds {len(test_inds)}')
+    for ir in list(regions.keys()):
+        selected_neurons[ir] = np.unique(scipy.sparse.find(rec.labels[:, regions[ir]])[0])
+        assert rec.spikes.shape[0] > rec.spikes.shape[1]
+#         train_data[ir] = rec.spikes[selected_neurons[ir], :][:, train_inds]
+#         test_data[ir] = rec.spikes[selected_neurons[ir], :][:, test_inds]
+        n_sel_cells[ir] = len(selected_neurons[ir])
+        full_data[ir] = rec.spikes[selected_neurons[ir], :]
+    vu_data = full_data[ir].copy()
+    rec = None
+    full_data = None
+    return vu_data
+
+def get_demeaned_hu_dynamics_from_rbm_file(vu_data, rbm_path):
+    # tmp_RBM = pickle.load(open(rbm_path, 'rb'))
+    # RBM = ssrbm.swap_sign_RBM(RBM=tmp_RBM, verbose=2, assert_hu_inds=hu_assert)
+    RBM = pickle.load(open(rbm_path, 'rb'))
+    assert vu_data.shape[0] > vu_data.shape[1], 'expected more neurons than time points'
+    hu_act = np.transpose(RBM.mean_hiddens(vu_data.T))
+    # ol = af.opt_leaf(hu_act_test)
+    # hu_act_test_remap = hu_act_test[ol, :]
+
+    ## demean HU activity by using average between its 2 peaks (foudn by GMM)
+    assert hu_act.shape[0] < hu_act.shape[1], 'expected more time points than HUs'
+    hu_activity_effectively_demeaned = hu_act.copy()
+    for mu in range(hu_act.shape[0]):
+        gmm = GaussianMixture(n_components=2).fit(hu_act[mu, :, np.newaxis])
+        two_peaks = gmm.means_[:2]
+        effective_mean = two_peaks.mean()
+        hu_activity_effectively_demeaned[mu, :] -= effective_mean
+    hu_act = hu_activity_effectively_demeaned.copy()
+    RBM = None
+    return hu_act
+
+def part_ratio_hu_activity(hu_activity, set_zero=True):
+    ## PR activity
+    n_hu, n_times = hu_activity.shape
+    tmp_hu_act = hu_activity
+    if set_zero:
+        tmp_hu_act[tmp_hu_act <= 0] = 0
+    pr_hus = np.zeros(n_times)
+    for tt in range(n_times):
+        pr_hus[tt] = p_metric_per_hu(tmp_hu_act[:, tt])
+    return pr_hus.copy()
+
+def get_all_prs_rbms(all_rbm_dir = '/media/thijs/hooghoudt/RBM_many_fishes_used_for_connectivity',
+                     all_data_dir_list=['/media/thijs/hooghoudt/Zebrafish_data/spontaneous_data_guillaume',
+                                        '/media/thijs/hooghoudt/Zebrafish_data/spontaneous_data_guillaume_T22']):
+    all_rbm_list = [x for x in os.listdir(all_rbm_dir) if x[-5:] == '.data']
+    n_rbms = len(all_rbm_list)
+    pr_dict = {}
+    data_name_dict = {k: [x for x in os.listdir(k) if x[-3:] == '.h5'] for k in all_data_dir_list}
+    # print(data_name_dict)
+    for i_rbm, rbm_name in enumerate(all_rbm_list):  # rbm names, see if they match with data names
+        print(f'{i_rbm}/{len(all_rbm_list)}')
+        gc.collect()  # explicit garbage collect is needed because otherwise it doesn't free memeroy of previous runs 
+        save_name = rbm_name[:-5]
+        name_dataset = rbm_name[4:18]
+        current_data_file_path = ''
+        for data_dir, data_name_list in data_name_dict.items():
+            assert len(data_name_list) == len(np.unique(data_name_list))
+            for i_data_name, data_name in enumerate(data_name_list):
+                if name_dataset == data_name[:14]:  # match
+                    current_data_dir_path = data_dir
+                    current_data_file_path = data_name
+                    break
+        if current_data_file_path == '':
+            print('NO data match found for rbm', rbm_name)
+            return
+        vu_data = get_neural_data(dir_path=current_data_dir_path,
+                                  file_path=current_data_file_path)
+        hu_data = get_demeaned_hu_dynamics_from_rbm_file(vu_data=vu_data,
+                                                         rbm_path=os.path.join(all_rbm_dir, rbm_name))
+        pr_hus = part_ratio_hu_activity(hu_activity=hu_data, set_zero=True)
+        pr_dict[rbm_name[:-5]] = pr_hus.copy()
+        vu_data, hu_data = None, None
+    return pr_dict

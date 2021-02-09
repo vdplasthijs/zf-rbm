@@ -580,7 +580,8 @@ def plot_distr(mat, min_th=1e-8):
 
 def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None,
                          key=None, compute_in_log=False, fill_diag=False,
-                         filter_zeros=False, set_limits=True, title='general'):
+                         filter_zeros=False, set_limits=True, title='general',
+                         use_one_triangle=True):
     if ax is None:
         ax = plt.subplot(111)
     assert struct_mat.shape == funct_mat.shape
@@ -591,24 +592,29 @@ def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None,
         struct_mat[np.arange(len(struct_mat)), np.arange(
             len(struct_mat))] += 1.0 * struct_mat.max()  # They did not define a diagonal connexion (intra-region connectivity). Set to the maximum value across all entry.
 
+    if use_one_triangle:
+        tri_inds = np.triu_indices_from(struct_mat, k=0)
+        assert (np.unique(struct_mat) == np.unique(struct_mat[tri_inds])).all()
+        struct_mat = struct_mat[tri_inds]
+        funct_mat = funct_mat[tri_inds]
 
     struct_mat = struct_mat.flatten()
     funct_mat = funct_mat.flatten()
 
     if filter_zeros:
-        print(funct_mat.shape)
+        print('before zero filtering ', funct_mat.shape)
 
-        inds = np.where(funct_mat > 0)
-        print(len(inds), inds[0].shape)
-        funct_mat  = funct_mat[inds]
-        struct_mat = struct_mat[inds]
+        assert len(np.where(funct_mat == 0)[0]) == 0, np.where(funct_mat == 0)
+        # inds = np.where(funct_mat > 0)  # not really needed be
+        # print(len(inds), inds[0].shape)
+        # funct_mat  = funct_mat[inds]
+        # struct_mat = struct_mat[inds]
 
         inds = np.where(struct_mat > 0)
-        print(len(inds), inds[0].shape)
         funct_mat  = funct_mat[inds]
         struct_mat = struct_mat[inds]
 
-        print(funct_mat.shape)
+        print('after zero filtering ', funct_mat.shape)
 
     if set_limits:
         # x_lim = (np.percentile(struct_mat, 10), np.percentile(struct_mat, 99.5))
@@ -644,7 +650,7 @@ def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None,
         print(p_val_spearman)
         sci_not = np.format_float_scientific(p_val_spearman, precision=3)
         sci_exp_ceil = int(sci_not.split('e')[1]) + 1
-        ax.set_title(f'{dr_names[key]} vs structural connectivity\nr = {np.round(spearman, 2)}, P < 10^{sci_exp_ceil}',
+        ax.set_title(f'{dr_names[key]} vs structural connectivity\n' + r'$\mathregular{r_S}$' + f' = {np.round(spearman, 2)}, P < 10^{sci_exp_ceil}',
                         fontdict={'weight': 'bold'})
     else:
         ax.set_title(f'Structural vs functional connectivity\nr = {np.round(spearman, 2)}',
@@ -695,3 +701,59 @@ def plot_multi_fish_connectivity_scatter(all_connections_tensor, fish_combinatio
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     return ax
+
+def plot_zero_vs_nz_connectivity(ax_pdf, ax_cdf, funct_mat, inds_struct_zero, inds_struct_nz,
+                                 colour_nz='#00b188', colour_zero='#00392c', method='RBM',
+                                 funct_nz={}, funct_zero={}, pdf_nz={}, pdf_zero={},
+                                 cdf_nz={}, cdf_zero={}, verbose=1):
+    funct_nz[method] = funct_mat[inds_struct_nz]
+    funct_zero[method] = funct_mat[inds_struct_zero]
+    ks_test = scipy.stats.ks_2samp(funct_nz[method].copy(),
+                                   funct_zero[method].copy(), mode='exact')
+    sci_not = np.format_float_scientific(ks_test[1], precision=3)
+    sci_exp_ceil = int(sci_not.split('e')[1]) + 1
+    if verbose > 0:
+        print(ks_test)
+    if verbose > 1:
+        print(af.kstest(funct_nz[method], funct_zero[method]))
+
+    plot_bins = np.linspace(np.min(funct_mat[~np.isnan(funct_mat)]),
+                            np.max(funct_mat[~np.isnan(funct_mat)]), 100)  # fix bins
+
+    pdf_nz[method], plot_bins = np.histogram(funct_nz[method], bins=plot_bins, density=True)
+    pdf_zero[method], plot_bins = np.histogram(funct_zero[method], bins=plot_bins, density=True)
+
+    cdf_nz[method] = np.cumsum(pdf_nz[method]) / np.max(np.cumsum(pdf_nz[method]))
+    cdf_zero[method] = np.cumsum(pdf_zero[method]) / np.max(np.cumsum(pdf_zero[method]))
+
+    plot_bins_centered = (plot_bins[1:] + plot_bins[:-1]) / 2
+
+    distance = (plot_bins_centered[int(np.argmin(np.abs(cdf_zero[method] - 0.5)))] -
+                plot_bins_centered[int(np.argmin(np.abs(cdf_nz[method] - 0.5)))])
+    width_zero = (plot_bins_centered[int(np.argmin(np.abs(cdf_zero[method] - 0.75)))] -
+                  plot_bins_centered[int(np.argmin(np.abs(cdf_zero[method] - 0.25)))])
+    width_nz = (plot_bins_centered[int(np.argmin(np.abs(cdf_nz[method] - 0.75)))] -
+                  plot_bins_centered[int(np.argmin(np.abs(cdf_nz[method] - 0.25)))])
+    print(method, distance / (0.5 * (width_nz + width_zero)))
+
+    ax_pdf.plot(plot_bins_centered, pdf_nz[method],
+                       label='Non-zero', c=colour_nz)
+    ax_pdf.plot(plot_bins_centered, pdf_zero[method],
+                       label='Zero', c=colour_zero)
+
+    ax_cdf.plot(plot_bins_centered,
+                       cdf_nz[method],
+                       label='Non-zero', c=colour_nz)
+    ax_cdf.plot(plot_bins_centered,
+                       cdf_zero[method],
+                       label='Zero', c=colour_zero)
+
+    ax_cdf.text(s=f'P < 10^{sci_exp_ceil}', x=plot_bins_centered[int(np.argmin(np.abs(cdf_zero[method] - 0.5)))] - 0.2, y=0.5,
+                       fontdict={'ha': 'right'})
+    ax_pdf.set_title(f'{dr_names[method]}', fontdict={'weight': 'bold'})
+    ax_cdf.set_xlabel('Functional connection\n(10-log scale)')
+    ax_pdf.set_xlim([-7, 0])
+    ax_cdf.set_xlim([-7, 0])
+    for ax in [ax_pdf, ax_cdf]:
+        for side in ['top', 'right']:
+            ax.spines[side].set_visible(False)
