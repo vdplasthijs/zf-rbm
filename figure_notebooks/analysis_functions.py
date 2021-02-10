@@ -541,7 +541,7 @@ def get_all_prs_rbms(all_rbm_dir = '/media/thijs/hooghoudt/RBM_many_fishes_used_
     # print(data_name_dict)
     for i_rbm, rbm_name in enumerate(all_rbm_list):  # rbm names, see if they match with data names
         print(f'{i_rbm}/{len(all_rbm_list)}')
-        gc.collect()  # explicit garbage collect is needed because otherwise it doesn't free memeroy of previous runs 
+        gc.collect()  # explicit garbage collect is needed because otherwise it doesn't free memeroy of previous runs
         save_name = rbm_name[:-5]
         name_dataset = rbm_name[4:18]
         current_data_file_path = ''
@@ -563,3 +563,50 @@ def get_all_prs_rbms(all_rbm_dir = '/media/thijs/hooghoudt/RBM_many_fishes_used_
         pr_dict[rbm_name[:-5]] = pr_hus.copy()
         vu_data, hu_data = None, None
     return pr_dict
+
+def n_cells_all_recordings(all_rbm_dir = '/media/thijs/hooghoudt/RBM_many_fishes_used_for_connectivity',
+                     all_data_dir_list=['/media/thijs/hooghoudt/Zebrafish_data/spontaneous_data_guillaume',
+                                        '/media/thijs/hooghoudt/Zebrafish_data/spontaneous_data_guillaume_T22']):
+
+    all_rbm_list = [x for x in os.listdir(all_rbm_dir) if x[-5:] == '.data']
+    n_rbms = len(all_rbm_list)
+    data_name_dict = {k: [x for x in os.listdir(k) if x[-3:] == '.h5'] for k in all_data_dir_list}
+
+    n_cells_dict = {}
+    i_rbm = 0
+    # for i_rbm, rbm_name in enumerate(all_rbm_list):  # rbm names, see if they match with data names
+    list_full_paths_datasets = []
+    while i_rbm < len(all_rbm_list):
+        rbm_name = all_rbm_list[i_rbm]
+        print(f'{i_rbm}/{len(all_rbm_list)}')
+        save_name = rbm_name[:-5]
+        name_dataset = rbm_name[4:18]
+        current_data_file_path = ''
+        for data_dir, data_name_list in data_name_dict.items():
+            assert len(data_name_list) == len(np.unique(data_name_list))
+            for i_data_name, data_name in enumerate(data_name_list):
+                if name_dataset == data_name[:14]:  # match
+                    full_path = os.path.join(data_dir, data_name)
+                    if full_path not in list_full_paths_datasets:
+                        list_full_paths_datasets.append(full_path)
+                    i_rbm += 1
+
+    # print(len(list_full_paths_datasets))
+    assert len(list_full_paths_datasets) == 8, len(list_full_paths_datasets) == len(np.unique(list_full_paths_datasets))
+
+    for i_dataset, data_path in enumerate(list_full_paths_datasets):
+        print(i_dataset, '/', len(list_full_paths_datasets))
+        gc.collect()  # explicit garbage collect is needed because otherwise it doesn't free memeroy of previous runs
+        rec = Zecording(path=data_path, kwargs={'ignorelags': True,
+                                                  'forceinterpolation': False,
+                                                  'ignoreunknowndata': True,# 'parent': self,
+                                                  'loadram': True})  # load data
+
+
+        selected_neurons = np.unique(scipy.sparse.find(rec.labels[:, np.arange(294)])[0])
+        assert rec.spikes.shape[0] > rec.spikes.shape[1]
+        n_sel_cells = len(selected_neurons)
+        short_data_name = data_path.split('/')[-1].rstrip('.h5')
+        n_cells_dict[short_data_name] = n_sel_cells
+
+    return n_cells_dict

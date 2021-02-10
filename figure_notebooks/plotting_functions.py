@@ -458,8 +458,8 @@ def plot_one_stat(density, xbins, ybins, title='', ax=None):
 #     plt.plot(xbins[1:], density.sum(1))
 #     plt.plot(xbins[1:], density.sum(0))
 
-    ax.set_xlabel(f'Experimental data');
-    ax.set_ylabel(f'Model-generated data')
+    ax.set_xlabel(f'Experimental statistics');
+    ax.set_ylabel(f'Model statistics')
     cax.set_ylabel('10-log PDF')
     ax.set_title(title)
     return ax
