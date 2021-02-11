@@ -16,18 +16,23 @@ import swap_sign_RBM as ssrbm
 sys.path.append('/home/thijs/repos/dnp-code/') # PGM3_correct/source/
 from fishualizer_utilities import Zecording
 
-def opt_leaf(w_mat, dim=0):
+def opt_leaf(w_mat, dim=0, link_metric='correlation'):
     '''create optimal leaf order over dim, of matrix w_mat. if w_mat is not an
-    np.array then its assumed to be a RNN layer. see also: https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.optimal_leaf_ordering.html#scipy.cluster.hierarchy.optimal_leaf_ordering'''
-    if type(w_mat) != np.ndarray:  # assume it's an rnn layer
-        w_mat = [x for x in w_mat.parameters()][0].detach().numpy()
+    np.array then its assumed to be a RNN layer.
+    see also: https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.optimal_leaf_ordering.html#scipy.cluster.hierarchy.optimal_leaf_ordering'''
+    # if type(w_mat) != np.ndarray:  # assume it's an rnn layer
+    #     w_mat = [x for x in w_mat.parameters()][0].detach().numpy()
     assert w_mat.ndim == 2
     if dim == 1:  # transpose to get right dim in shape
         w_mat = w_mat.T
-    dist = scipy.spatial.distance.pdist(w_mat, metric='euclidean')  # distanc ematrix
+    dist = scipy.spatial.distance.pdist(w_mat, metric=link_metric)  # distanc ematrix
     link_mat = scipy.cluster.hierarchy.ward(dist)  # linkage matrix
-    opt_leaves = scipy.cluster.hierarchy.leaves_list(scipy.cluster.hierarchy.optimal_leaf_ordering(link_mat, dist))
-    return opt_leaves
+    if link_metric == 'euclidean' and True:
+        opt_leaves = scipy.cluster.hierarchy.leaves_list(scipy.cluster.hierarchy.optimal_leaf_ordering(link_mat, dist))
+        print('OPTIMAL LEAF SOSRTING AND EUCLIDEAN USED')
+    else:
+        opt_leaves = scipy.cluster.hierarchy.leaves_list(link_mat)
+    return opt_leaves, (link_mat, dist)
 
 def count_connections(weight_matrix, K_arr = np.arange(11),
                       perc_top= 99.999, n_w_th = 250):

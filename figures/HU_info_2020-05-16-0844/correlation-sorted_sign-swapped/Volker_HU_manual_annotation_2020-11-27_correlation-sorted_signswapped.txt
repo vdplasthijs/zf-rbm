@@ -1,0 +1,150 @@
+HU:
+0 => Tectum stratum periventriculars
+1 => tectum stratum periventriculare => medial
+2 => tectum stratum periventriculare => medial
+3 => Tectum stratum periventriculars
+4 => Tectum stratum periventriculars 
+5 => tectum stratum periventriculare => medial
+6 => tectum stratum periventriculare => medial
+7 => Tectum stratum periventriculars
+8 => Tectum stratum periventriculars
+9 => tectum stratum periventriculare => medial
+10 => Tectum stratum periventriculars
+11 => Tectum stratum periventriculars
+12 => tectum stratum periventriculare => medial
+13 => Tectum stratum periventriculars
+14 => Tectum stratum periventriculars
+15 => Tectum stratum periventriculars
+16 => Tectum stratum periventriculars
+17 => Tectum stratum periventriculars
+!   18 => Diencephalon and midbrain cluster => sparse activity !
+20 => Tectum stratum periventriculars
+21 => tectum stratum periventriculare => medial
+22 => tectum stratum periventriculare => lateral
+23 => Tectum stratum periventriculars
+24 => tectum stratum periventriculare => lateral
+28 => tectum stratum periventriculare => medial   <=> 2
+29 => Tectum stratum periventriculars
+31 => tectum neuropil
+32 => torus semicircular
+!   33 => lateral tegmentum 
+34 => lateral torus semicircular
+35 => torus semicircularis
+37 => tectum stratum periventriculare
+38 => Tectum stratum periventriculars
+39 => pretectum + dorsal thalamus
+41 => big caudal cluster in mid and forebrain
+42 => cerebellum Vglut2 enriched
+43 => torus semicircularis
+45 => nMLF (tegmentum) 
+46 => nMLF + nIII + nIV
+47 => pretectum + AF9
+48 => Gad1b cluster => many neurons not so clear 
+!   52 => medial caudal hindbrain cluster
+53 => isl1 cluster ???? (small number of neurons)
+!   54 => left ( nMLF ; nIII ; nIV ; hindbrain stripes)
+55 => valvula cerebellum => Gad1b
+56 => neuromodulation ? Raphe + Gad1b + volut2
+57 => cerebellum
+58 => Tectrum stratum periventriculars
+59 => Tectrum stratum periventriculars
+60 => Tectrum stratum periventriculars
+61 => Tectrum stratum periventriculars
+62 => tectum stratum periventriculare => medial
+63 => Tectrum stratum periventriculars
+64 => Tectrum stratum periventriculars
+65 => Tectum stratum periventriculars
+66 => Tectrum stratum periventriculars
+67 => Tectrum stratum periventriculars 
+68 => Tectrum stratum periventriculars
+73 => cerebellar vglut2 enriched area  + eminentia granular (granular cells ???)
+75 => small but very active
+76 => Tectrum stratum periventriculars 
+80 => tectum stratum periventriculare => medial
+81 => Tectrum stratum periventriculars
+82 => Tectrum stratum periventriculars
+83 => Tectrum stratum periventriculars 
+84 => Tectrum stratum periventriculars 
+85 => Tectrum stratum periventriculars 
+86 => Tectrum stratum periventriculars 
+87 => Tectum stratum periventriculars
+88 => Tectum stratum periventriculars
+89 => Tectrum stratum periventriculars 
+90 => Tectum stratum periventriculars
+!   91 => medial hindbrain stripes (especially looks interesting)
+!   92 => medial hindbrain stripes
+!   93 => big lateral cluster perhaps related to strong tail flip ???
+94 => oscillator
+!   95 => medial hindbrain stripes
+!!   96 => small number of neurons => interesting bimodal activity
+!   98 => VII facial motor  and ovtovolateralis effent neurons => Interesting !!!
+!!   99 => oscillator
+!!   100 => statoacoustic ganglion; tangential vestibular nucleus; RS vestibular population => slow decay activity 
+!!   101 => statoacoustic ganglion; tangential vestibular nucleus; =>  slow decay activity  == 100
+102 => saccarde circuit
+104 => small clearly defined hindbrain cluster MidD2 => what is this?
+108 => nMLF and hindbrain cluster
+!   110 => two clusters around ears 
+111 => many neurons but symmetric in hindbrain
+!!   112 => nV + Isl1 motor neurons + Spinal cord + nice clusters at midbrain-hindbrain boundary  => related to behaviour?
+!   114 => similar to 117 but less neurons and similar activity
+!   116 => Spinal cord and well defined small and symmetric hindbrain regions
+!   117 => Spinal cord ; RS neurons ; two symmetric nice clusters ; purkinje cells ? 
+118 => oscillator ?
+!   124 => blue midbrain + red hindbrain
+125 => nIII
+126 => == 110
+!!   127 => medial vestibular nucleus + oculomotor neurons? + preteritum ?
+128 => interesting two cluster pattern
+!   133 => Gad1b stripe 3 ; Glyt stripe 3; Vglut2 stripe 3
+134 => nV Trigeminal Motorneurons ; VII facial motor and octavolateralis efferent neurons; olig2 stripe
+!   135 => Gad1b stripe 2 ; Vglut2 stripe 2
+!   140 => Corpus Cerebelli ; Cerebellar Vglut2  => granular cells ?
+!!   141 => nice symmetric cerebellar cluster
+143 => vagal motor neurons + vagal ganglia !
+150 => cerebellum (valvular + corpus )=> nice dense small cluster ()
+152 => vagus motor neurons + vagus ganglion == 154
+!   153 => brain wide cluster from Diencephalon to midbrain to hindbrain
+!   154 => vagus motor neurons + vagus ganglion
+158 => diffuse
+159 => oscillator ?  + IPN
+160 => Valvula cerebelli + nIV
+161 => oscillator ?
+163 => nIII -> saccarde circuit  ?
+!!!   164 => left right symmetry between inhibitory and exitatory cluster
+168 => nIII -> saccarde circuit ?
+174 => statoacoustic ganglion
+!   175 => diffuse But => symmetric blue and red organisation
+176 => olfactory bulb
+!!   177 => Telencephalon: Pallium ; Subpallium + IPN ?
+!!   178 => Telencephalon + Hindbrain cluster => similar but less defined as 177
+180 => diffuse but symmetric
+183 => clear cluster in rhombencephalon
+!   185 => asymmetric cluster
+!   186 => as 185 but mirror symmetric to the mid plane
+187 => torus semicircularis
+188 =>  torus semicircularis
+189 => torus semicircularis
+190 => torus semicircularis
+!!   191 => lobus caudalis cerebelli + contralateral cluster in rhombomere 2
+192 => locus coreueleus (noradrenergic nucleus) + torus semicirucalis + cerebellum
+!   193 => as 191 but more diffuse
+194 => diffuse
+197 => broadly distributed
+!   198 => small active double cluster => not sure what this is
+!   199 => symmetric cerebellum; nIV ; hypothalamus and others
+
+
+
+
+ToDo 
+group all Tectum stratum periventriculars in one plot with different colours (give number of HU)   ~ N = fifty  or in one pdf
+group all torus semicircular HU in one plot with different colours (give number of HU): 32, 34, 35, 43,  187, 188, 190, 190,  192
+make a group of HU with combined red and blue receptive fields: ! 48, ! 56,  ! 72, 77, 78,  113, 122, 124, 132, ! 143, 175
+group all raphe clusters
+group all cerebellum clusters: 42,  55, 57, 73,  ! 140, !! 141, 150, 160, !! 191, 192, ! 199
+group all spinal chord cluster: 53,  116, 117,  124
+Oscillator / saccarde circuit: 94, 99,  161, 163,  167
+group hindbrain stripe HUs: 54, 91, 92, 94, 95, 119, 121,  122, 133, 134, 135, 143, 169,  170, 171, 172, 173
+group vestibular cluster:  100, 101,  127
+
