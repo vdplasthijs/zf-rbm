@@ -24,6 +24,7 @@ import seaborn as sns
 import pandas as pd
 import scipy.stats
 
+import analysis_functions as af
 from cycler import cycler
 ## Create list with standard colors:
 color_dict_stand = {}
@@ -34,7 +35,7 @@ for ii, x in enumerate(plt.rcParams['axes.prop_cycle']()):
 plt.rcParams['axes.prop_cycle'] = cycler(color=sns.color_palette('colorblind'))
 
 
-dr_legend = {'pca': 'PCA', 'rbm': 'RBM', 'fa': 'FA', 'ica': 'ICA', 'glm': 'GLM'}
+dr_legend = {'pca': 'PCA', 'rbm': 'cRBM', 'fa': 'FA', 'ica': 'ICA', 'glm': 'GLM'}
 dr_colors = {'glm': '#008B8B', 'pca': '#808000', 'rbm': '#800080', 'fa': 'red', 'ica':'#157bf9'}
 dr_names = {'rbm': 'cRBM', 'RBM': 'cRBM', 'pca': 'PCA', 'PCA': 'PCA',
             'covariance': 'covariance', 'correlation': 'correlation'}
@@ -304,7 +305,7 @@ def plot_degree_distr(degree_dict, degree_dict_sh, ax=None, dr='rbm', plot_shuff
     else:
         xlabels[-1] = f'>{xlabels[-2]}'
     ax.set_xticklabels(xlabels)
-    ax.set_xlabel('# Strong weights per neuron')
+    ax.set_xlabel('# Strong weights per neuron\n(such that ' + r'$\mathrm{\mathbb{E}} = 1$' + ')')
     if normalise:
         ax.set_ylabel('PDF')
     else:
@@ -328,13 +329,13 @@ def plot_three_degree_distr(degree_dict, ax=None,
 
     max_degree_dict = {k: v.max() for k, v in degree_dict.items()}
     for k, v in max_degree_dict.items():
-        if cutoff > v:
+        if cutoff > v and v > 12:
             cutoff = v
             print(f'cut off decreased to max degree {v}')
     tmp_bar_heights, bar_heights = {}, {}
     for k, degree in degree_dict.items():
         degree_values = np.arange(cutoff + 1)
-        tmp_bar_heights[k] = np.array([np.sum(degree == d) for d in range(max_degree_dict[k] + 1)])
+        tmp_bar_heights[k] = np.array([np.sum(degree == d) for d in range(np.maximum(max_degree_dict[k] + 1, cutoff))])
         bar_heights[k] = np.zeros_like(degree_values)
         bar_heights[k][:cutoff] = tmp_bar_heights[k][:cutoff]
         bar_heights[k][cutoff] = np.sum(tmp_bar_heights[k][cutoff:])
@@ -402,7 +403,7 @@ def plot_reproduc_mat(dict_mat, key, ax=None, corr_type='pearson',
         mask[np.triu_indices_from(data, k=0)] = True
     sns.heatmap(data, annot=False, ax=ax, square=True, mask=mask, vmin=0, vmax=1,
                 linewidths=0, rasterized=True,
-                cmap='pink_r', cbar_kws={'label': f'{corr_type[0].upper() + corr_type[1:]} correlation'})
+                cmap='pink_r', cbar_kws={'label': f'{corr_type[0].upper() + corr_type[1:]} correlation ' + r'$\mathregular{r_P}$'})
     ax.set_xlabel('# Fish')
     ax.set_ylabel('# Fish')
     if plot_diag:
@@ -465,7 +466,8 @@ def plot_one_stat(density, xbins, ybins, title='', ax=None):
     return ax
 
 def plot_connectivity_matrix(matrix, region_names, size=15, subset=range(72),
-                             cbar=False, cax=None, cmap='jet',
+                             cbar=False, cax=None,
+                             cmap='viridis',  # or perceptual rainbo 16? https://github.com/jiffyclub/palettable/blob/master/palettable/cubehelix/cubehelix.py
                              scale_limits=True, ax=None, region_order_dict=None,
                              plot_log=False, reverse_x=True, plot_labels=True,
                              mini=None, maxi=None, fill_zeros_with_min=False,
@@ -661,7 +663,8 @@ def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None,
     return (pearson, spearman)
 
 def plot_multi_fish_connectivity_scatter(all_connections_tensor, fish_combinations=[(0, 1)],
-                                         ax=None, axis_lim=None, one_indexing_labels=True):
+                                         ax=None, axis_lim=None, one_indexing_labels=True,
+                                         use_triangle=True, use_nonzero=True):
     if ax is None:
         ax = plt.subplot(111)
     plot_dens_1 = np.array([])  # save x axis
@@ -669,13 +672,32 @@ def plot_multi_fish_connectivity_scatter(all_connections_tensor, fish_combinatio
     plot_colours = np.array([])
 
     for i_plot, fish_inds in enumerate(fish_combinations):  # collect data
-        tmp_dens_1 = np.log10(all_connections_tensor[: ,:, fish_inds[0]] + 1e-20).flatten()
-        tmp_dens_2 = np.log10(all_connections_tensor[: ,:, fish_inds[1]] + 1e-20).flatten()
+        if use_triangle is False:
+            tmp_dens_1 = np.log10(all_connections_tensor[: ,:, fish_inds[0]] + 1e-20).flatten()
+            tmp_dens_2 = np.log10(all_connections_tensor[: ,:, fish_inds[1]] + 1e-20).flatten()
+        else:
+            tmp_dens_1 = all_connections_tensor[: ,:, fish_inds[0]]
+            tmp_dens_2 = all_connections_tensor[: ,:, fish_inds[1]]
+            tri_inds = np.triu_indices_from(tmp_dens_1, k=0)
+            tmp_dens_1 = tmp_dens_1[tri_inds]
+            tmp_dens_2 = tmp_dens_2[tri_inds]
+            if use_nonzero is False:
+                tmp_dens_1 = np.log10(tmp_dens_1 + 1e-20).flatten()
+                tmp_dens_2 = np.log10(tmp_dens_2 + 1e-20).flatten()
+            else:
+                nz_inds = np.logical_and(tmp_dens_1 > 0, tmp_dens_2 > 0)
+                tmp_dens_1 = tmp_dens_1[nz_inds]
+                tmp_dens_2 = tmp_dens_2[nz_inds]
+                tmp_dens_1 = np.log10(tmp_dens_1).flatten()
+                tmp_dens_2 = np.log10(tmp_dens_2).flatten()
+
         plot_dens_1 = np.concatenate((plot_dens_1, tmp_dens_1))
         plot_dens_2 = np.concatenate((plot_dens_2, tmp_dens_2))
         plot_colours = np.concatenate((plot_colours, np.zeros_like(tmp_dens_1) + i_plot))  # int index for oclour
     random_inds = np.random.choice(a=len(plot_colours), size=len(plot_colours), replace=False) # shuffle so points are mixed
-
+    lim_min = np.minimum(np.min(plot_dens_1), np.min(plot_dens_2))
+    lim_max = np.maximum(np.max(plot_dens_1), np.max(plot_dens_2))
+    ax.plot([lim_min, lim_max], [lim_min, lim_max], c='grey', alpha=0.5, linestyle=':')
     ax.scatter(plot_dens_1[random_inds], plot_dens_2[random_inds], c=plot_colours[random_inds],
                 alpha=0.8, s=12)
     ax.set_xlabel('Region to region connectivity\n in Fish A (10-log scale)');
@@ -686,7 +708,9 @@ def plot_multi_fish_connectivity_scatter(all_connections_tensor, fish_combinatio
         if axis_lim == [-6, -1.5]:
             ax.set_xticks(np.arange(-6, -1))
             ax.set_yticks(np.arange(-6, -1));
-
+    else:
+        ax.set_xlim([lim_min, lim_max])
+        ax.set_ylim([lim_min, lim_max])
     viridis = matplotlib.cm.get_cmap('viridis', len(fish_combinations))  # this is defaul tin scatter
     handle_dict = [matplotlib.lines.Line2D([], [], marker='o',
                                            c='white', markerfacecolor=viridis(i_plot)) for i_plot in range(len(fish_combinations))]
@@ -702,10 +726,22 @@ def plot_multi_fish_connectivity_scatter(all_connections_tensor, fish_combinatio
     ax.spines['right'].set_visible(False)
     return ax
 
-def plot_zero_vs_nz_connectivity(ax_pdf, ax_cdf, funct_mat, inds_struct_zero, inds_struct_nz,
+def plot_zero_vs_nz_connectivity(ax_pdf, ax_cdf, funct_mat, struct_mat,
                                  colour_nz='#00b188', colour_zero='#00392c', method='RBM',
                                  funct_nz={}, funct_zero={}, pdf_nz={}, pdf_zero={},
-                                 cdf_nz={}, cdf_zero={}, verbose=1):
+                                 cdf_nz={}, cdf_zero={}, verbose=1, use_triangle=True):
+    if use_triangle:
+        triangle_mat = np.zeros_like(struct_mat)
+        tri_inds = np.triu_indices_from(triangle_mat, k=0)
+        triangle_mat[tri_inds] = 1
+        inds_struct_nz = np.where(np.logical_and(struct_mat != 0, triangle_mat != 0))
+        inds_struct_zero = np.where(np.logical_and(struct_mat == 0, triangle_mat != 0))
+        assert inds_struct_nz[0].shape[0] + inds_struct_zero[0].shape[0] == struct_mat[tri_inds].size
+    else:
+        inds_struct_zero = np.where(struct_mat == 0)
+        inds_struct_nz = np.where(struct_mat != 0)
+        assert inds_struct_nz[0].shape[0] + inds_struct_zero[0].shape[0] == struct_mat.size
+    print(f'{len(inds_struct_zero[0])} zero and {len(inds_struct_nz[0])} non-zero structural connections')
     funct_nz[method] = funct_mat[inds_struct_nz]
     funct_zero[method] = funct_mat[inds_struct_zero]
     ks_test = scipy.stats.ks_2samp(funct_nz[method].copy(),

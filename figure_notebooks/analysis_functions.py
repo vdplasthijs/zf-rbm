@@ -271,14 +271,19 @@ def load_reprod_matrix(path, swap=False):
 
 def compute_median_state_occupancy(activity, bimodality=0, freq=1):
     n_units, n_times = activity.shape
-    median_activity_period = np.zeros((n_units, 2))
+    median_activity_period = np.zeros((n_units, 3))
 
     for mu in range(n_units):
         tmp = np.sign(activity[mu, :] - bimodality)  # +1 or -1, as bimodality is around 0
         tmp_inds = np.where(tmp[1:] - tmp[:-1])[0] # where non zero? = state change
-
         duration_1 = (tmp_inds[1::2] - tmp_inds[:-1:2]) / freq  # skip 1 to only get 1 state type.
         duration_2 = (tmp_inds[2::2] - tmp_inds[1:-1:2]) / freq # get the other type
+
+        if tmp[0] == 1: # start with spike
+            burst_duration = duration_2
+        elif tmp[0] == -1:  # start with rest
+            burst_duration = duration_1
+
         if len(duration_1) == 1 and len(duration_2) == 0:
             median_activity_period[mu, :] = duration_1[0]
         elif len(duration_1) == 0 and len(duration_2) == 0:
@@ -286,9 +291,15 @@ def compute_median_state_occupancy(activity, bimodality=0, freq=1):
         else:
             median_activity_period[mu, 0] = np.maximum(np.median(duration_1), np.median(duration_2))
             median_activity_period[mu, 1] = np.minimum(np.median(duration_1), np.median(duration_2))
+            assert np.abs(len(duration_1) - len(duration_2)) <= 1  # at most 1 rest or spike period more
+            if len(duration_2) == len(duration_1) - 1:  # if 1 rest period more, discard firs t
+                duration_1 = duration_1[1:]
+            median_activity_period[mu, 2] = np.median(duration_1 + duration_2)
         if np.isnan(median_activity_period[mu, 0]):
             print('ERROR: NaN found - BREAKING')
             return
+        # if mu == 5:
+        #     return
     return median_activity_period
 
 def create_mapping_kunstea_order(current_regions):
@@ -397,7 +408,7 @@ def compute_median_discretised_state_occupancy(activity_mat, frequency=1, margin
     median_period_duration = np.zeros(n_hu)
     count_bursts = np.zeros(n_hu)
 
-    for mu in range(n_hu):
+    for mu in range(90, n_hu):
         discrete_h = discretize(activity_mat[mu, :], margin=margin, plot=False)  # discretised signal to {0, 1, 2}
         if verbose > 1:
             print('Unit %s, P(h=-1)=%.3f,P(h=0)=%.3f,P(h=+1)=%.3f'% (
@@ -409,10 +420,12 @@ def compute_median_discretised_state_occupancy(activity_mat, frequency=1, margin
 
         list_silence_durations, list_burst_durations, list_period_durations = get_burst_and_silence_times(discrete_h)
         median_silence_duration[mu] = np.median(list_silence_durations / frequency)
-        median_burst_duration[mu] = np.median(list_burst_durations / frequency)
+        median_burst_duration[mu] = np.mean(list_burst_durations / frequency)
         median_period_duration[mu] = np.median(list_period_durations / frequency)
         count_bursts[mu] = len(list_burst_durations)
-
+        # print(np.sort(list_burst_durations), np.median(list_burst_durations), np.mean(list_burst_durations))
+        # if mu == 120:
+        #     return
     return median_silence_duration, median_burst_duration, median_period_duration, count_bursts
 
 
