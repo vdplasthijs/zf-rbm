@@ -712,7 +712,7 @@ def plot_multi_fish_connectivity_scatter(all_connections_tensor, fish_combinatio
         ax.set_xlim([lim_min, lim_max])
         ax.set_ylim([lim_min, lim_max])
     viridis = matplotlib.cm.get_cmap('viridis', len(fish_combinations))  # this is defaul tin scatter
-    handle_dict = [matplotlib.lines.Line2D([], [], marker='o',
+    handle_dict = [matplotlib.lines.Line2D([], [], marker='o', markersize=10,
                                            c='white', markerfacecolor=viridis(i_plot)) for i_plot in range(len(fish_combinations))]
     if one_indexing_labels:
         legend_labels = [f'{str(x[0] + 1)}-{str(x[1] + 1)}' for x in fish_combinations]
@@ -721,7 +721,7 @@ def plot_multi_fish_connectivity_scatter(all_connections_tensor, fish_combinatio
     ax.legend(handles=handle_dict,
               # labels=[f'A: #{str(x[0])}, B: #{str(x[1])}' for x in fish_combinations],
               labels=legend_labels,
-              frameon=False, loc='upper left', bbox_to_anchor=(-0.08, 1.07));
+              frameon=False, loc='upper left', bbox_to_anchor=(-0.02, 1.07));
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     return ax
@@ -729,7 +729,8 @@ def plot_multi_fish_connectivity_scatter(all_connections_tensor, fish_combinatio
 def plot_zero_vs_nz_connectivity(ax_pdf, ax_cdf, funct_mat, struct_mat,
                                  colour_nz='#00b188', colour_zero='#00392c', method='RBM',
                                  funct_nz={}, funct_zero={}, pdf_nz={}, pdf_zero={},
-                                 cdf_nz={}, cdf_zero={}, verbose=1, use_triangle=True):
+                                 cdf_nz={}, cdf_zero={}, verbose=1, use_triangle=True,
+                                 draw_pval=True):
     if use_triangle:
         triangle_mat = np.zeros_like(struct_mat)
         tri_inds = np.triu_indices_from(triangle_mat, k=0)
@@ -783,9 +784,9 @@ def plot_zero_vs_nz_connectivity(ax_pdf, ax_cdf, funct_mat, struct_mat,
     ax_cdf.plot(plot_bins_centered,
                        cdf_zero[method],
                        label='Zero', c=colour_zero)
-
-    ax_cdf.text(s=f'P < 10^{sci_exp_ceil}', x=plot_bins_centered[int(np.argmin(np.abs(cdf_zero[method] - 0.5)))] - 0.2, y=0.5,
-                       fontdict={'ha': 'right'})
+    if draw_pval:
+        ax_cdf.text(s=f'P < 10^{sci_exp_ceil}', x=plot_bins_centered[int(np.argmin(np.abs(cdf_zero[method] - 0.5)))] - 0.2, y=0.5,
+                           fontdict={'ha': 'right'})
     ax_pdf.set_title(f'{dr_names[method]}', fontdict={'weight': 'bold'})
     ax_cdf.set_xlabel('Functional connection\n(10-log scale)')
     ax_pdf.set_xlim([-7, 0])

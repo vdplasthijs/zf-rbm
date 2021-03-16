@@ -162,6 +162,22 @@ def count_connections_3(weight_matrix):
 
     return (degree_vu, degree_vu_sh)
 
+
+def llh1d(real_trace, pred_trace):
+    tmp = False
+    real_trace = np.squeeze(real_trace)
+    real_trace = real_trace.astype('float32')
+    pred_trace = np.squeeze(pred_trace)
+    assert len(real_trace) == len(pred_trace)
+    ## assert real_trace is only 0s and 1s
+    #     llho = np.sum(np.log(np.multiply(real_trace, (2*pred_trace - 1)) + np.ones_like(pred_trace) - pred_trace))
+    llh = np.sum(np.log(np.clip(np.multiply(real_trace, pred_trace) +
+                                np.multiply((1 - real_trace), (1 - pred_trace)),
+                                a_min=0.0000001, a_max=np.inf)))  # clip for pca < 0 (and log)
+
+    return llh, tmp
+
+
 def freq_distr_weighted_regions(w_vector, m_labels):
     w_vector = np.abs(w_vector)
     weighted_labels = np.dot(w_vector, m_labels)  # weighted product of region labels
@@ -178,10 +194,10 @@ def freq_entropy(prob_distr):
     entropy = -1 * np.sum(tmp)
     return entropy
 
-def p_metric_per_hu(w_vector):
+def p_metric_per_hu(w_vector, a=2):
     w_vector = np.squeeze(w_vector)
 #     assert w_vector.dim == 1
-    p = np.power(np.sum(np.power(w_vector, 2)), 2) / np.sum(np.power(w_vector, 4))
+    p = np.power(np.sum(np.power(w_vector, a)), 2) / np.sum(np.power(w_vector, (2 * a)))
     p = p / len(w_vector)
     return np.squeeze(p)
 
@@ -517,7 +533,7 @@ def get_neural_data(dir_path, file_path):
     full_data = None
     return vu_data
 
-def get_demeaned_hu_dynamics_from_rbm_file(vu_data, rbm_path):
+def get_demeaned_hu_dynamics_from_rbm_file(vu_data, rbm_path, demean_or_depeak='demean'):
     # tmp_RBM = pickle.load(open(rbm_path, 'rb'))
     # RBM = ssrbm.swap_sign_RBM(RBM=tmp_RBM, verbose=2, assert_hu_inds=hu_assert)
     RBM = pickle.load(open(rbm_path, 'rb'))
@@ -529,20 +545,26 @@ def get_demeaned_hu_dynamics_from_rbm_file(vu_data, rbm_path):
     ## demean HU activity by using average between its 2 peaks (foudn by GMM)
     assert hu_act.shape[0] < hu_act.shape[1], 'expected more time points than HUs'
     hu_activity_effectively_demeaned = hu_act.copy()
+    # two_peak_mat = np.zeros((hu_act.shape[0], 2))
     for mu in range(hu_act.shape[0]):
         gmm = GaussianMixture(n_components=2).fit(hu_act[mu, :, np.newaxis])
         two_peaks = gmm.means_[:2]
+        # two_peak_mat[mu, :] = two_peaks
         effective_mean = two_peaks.mean()
-        hu_activity_effectively_demeaned[mu, :] -= effective_mean
+        if demean_or_depeak == 'demean':
+            hu_activity_effectively_demeaned[mu, :] -= effective_mean
+        elif demean_or_depeak == 'depeak':
+            hu_activity_effectively_demeaned[mu, :] -= np.min(two_peaks)
     hu_act = hu_activity_effectively_demeaned.copy()
     RBM = None
-    return hu_act
+    return hu_act#, two_peak_mat
 
 def part_ratio_hu_activity(hu_activity, set_zero=True):
     ## PR activity
     n_hu, n_times = hu_activity.shape
     tmp_hu_act = hu_activity
     if set_zero:
+        print('WARNING: setting below-zero activity to 0')
         tmp_hu_act[tmp_hu_act <= 0] = 0
     pr_hus = np.zeros(n_times)
     for tt in range(n_times):
@@ -551,7 +573,8 @@ def part_ratio_hu_activity(hu_activity, set_zero=True):
 
 def get_all_prs_rbms(all_rbm_dir = '/media/thijs/hooghoudt/RBM_many_fishes_used_for_connectivity',
                      all_data_dir_list=['/media/thijs/hooghoudt/Zebrafish_data/spontaneous_data_guillaume',
-                                        '/media/thijs/hooghoudt/Zebrafish_data/spontaneous_data_guillaume_T22']):
+                                        '/media/thijs/hooghoudt/Zebrafish_data/spontaneous_data_guillaume_T22'],
+                     demean_or_depeak='demean', bool_set_zero=False):
     all_rbm_list = [x for x in os.listdir(all_rbm_dir) if x[-5:] == '.data']
     n_rbms = len(all_rbm_list)
     pr_dict = {}
@@ -576,8 +599,9 @@ def get_all_prs_rbms(all_rbm_dir = '/media/thijs/hooghoudt/RBM_many_fishes_used_
         vu_data = get_neural_data(dir_path=current_data_dir_path,
                                   file_path=current_data_file_path)
         hu_data = get_demeaned_hu_dynamics_from_rbm_file(vu_data=vu_data,
-                                                         rbm_path=os.path.join(all_rbm_dir, rbm_name))
-        pr_hus = part_ratio_hu_activity(hu_activity=hu_data, set_zero=True)
+                                                         rbm_path=os.path.join(all_rbm_dir, rbm_name),
+                                                         demean_or_depeak=demean_or_depeak)
+        pr_hus = part_ratio_hu_activity(hu_activity=hu_data, set_zero=bool_set_zero)
         pr_dict[rbm_name[:-5]] = pr_hus.copy()
         vu_data, hu_data = None, None
     return pr_dict
@@ -590,13 +614,13 @@ def n_cells_all_recordings(all_rbm_dir = '/media/thijs/hooghoudt/RBM_many_fishes
     n_rbms = len(all_rbm_list)
     data_name_dict = {k: [x for x in os.listdir(k) if x[-3:] == '.h5'] for k in all_data_dir_list}
 
-    n_cells_dict = {}
+    n_cells_dict, time_dict, freq_dict = {}, {}, {}
     i_rbm = 0
     # for i_rbm, rbm_name in enumerate(all_rbm_list):  # rbm names, see if they match with data names
     list_full_paths_datasets = []
     while i_rbm < len(all_rbm_list):
         rbm_name = all_rbm_list[i_rbm]
-        print(f'{i_rbm}/{len(all_rbm_list)}')
+        # print(f'{i_rbm}/{len(all_rbm_list)}')
         save_name = rbm_name[:-5]
         name_dataset = rbm_name[4:18]
         current_data_file_path = ''
@@ -626,5 +650,7 @@ def n_cells_all_recordings(all_rbm_dir = '/media/thijs/hooghoudt/RBM_many_fishes
         n_sel_cells = len(selected_neurons)
         short_data_name = data_path.split('/')[-1].rstrip('.h5')
         n_cells_dict[short_data_name] = n_sel_cells
+        time_dict[short_data_name] = len(rec.time)
+        freq_dict[short_data_name] = rec.sampling_rate
 
-    return n_cells_dict
+    return (n_cells_dict, time_dict, freq_dict)
