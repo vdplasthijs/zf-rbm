@@ -295,10 +295,10 @@ def compute_median_state_occupancy(activity, bimodality=0, freq=1):
         duration_1 = (tmp_inds[1::2] - tmp_inds[:-1:2]) / freq  # skip 1 to only get 1 state type.
         duration_2 = (tmp_inds[2::2] - tmp_inds[1:-1:2]) / freq # get the other type
 
-        if tmp[0] == 1: # start with spike
-            burst_duration = duration_2
-        elif tmp[0] == -1:  # start with rest
-            burst_duration = duration_1
+        # if tmp[0] == 1: # start with spike
+        #     burst_duration = duration_2
+        # elif tmp[0] == -1:  # start with rest
+        #     burst_duration = duration_1
 
         if len(duration_1) == 1 and len(duration_2) == 0:
             median_activity_period[mu, :] = duration_1[0]
@@ -424,7 +424,7 @@ def compute_median_discretised_state_occupancy(activity_mat, frequency=1, margin
     median_period_duration = np.zeros(n_hu)
     count_bursts = np.zeros(n_hu)
 
-    for mu in range(90, n_hu):
+    for mu in range(0, n_hu):
         discrete_h = discretize(activity_mat[mu, :], margin=margin, plot=False)  # discretised signal to {0, 1, 2}
         if verbose > 1:
             print('Unit %s, P(h=-1)=%.3f,P(h=0)=%.3f,P(h=+1)=%.3f'% (
