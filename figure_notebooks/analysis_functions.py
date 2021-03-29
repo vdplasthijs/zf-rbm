@@ -285,34 +285,57 @@ def load_reprod_matrix(path, swap=False):
     return dict_matrices
 
 
-def compute_median_state_occupancy(activity, bimodality=0, freq=1):
+def compute_median_state_occupancy(activity, bimodality=0, freq=1, tp_split_arr=np.array([], dtype='int'), verbose=0):
     n_units, n_times = activity.shape
     median_activity_period = np.zeros((n_units, 3))
+    if len(tp_split_arr) > 0 and verbose > 0:
+        print('Splitting at time points', tp_split_arr)
+    if type(tp_split_arr) is not np.array:
+        tp_split_arr = np.array(tp_split_arr)
 
-    for mu in range(n_units):
-        tmp = np.sign(activity[mu, :] - bimodality)  # +1 or -1, as bimodality is around 0
-        tmp_inds = np.where(tmp[1:] - tmp[:-1])[0] # where non zero? = state change
-        duration_1 = (tmp_inds[1::2] - tmp_inds[:-1:2]) / freq  # skip 1 to only get 1 state type.
-        duration_2 = (tmp_inds[2::2] - tmp_inds[1:-1:2]) / freq # get the other type
+    assert tp_split_arr.ndim == 1
+    tp_split_arr = np.concatenate((tp_split_arr, np.array([activity.shape[1]], dtype='int'))) # end
+    tp_split_arr = np.concatenate((np.array([0], dtype='int'), tp_split_arr))  # beginning
+    n_tp_loop = len(tp_split_arr) - 1
+
+    for mu in tqdm(range(n_units)):
+        duration_1 = np.array([])
+        duration_2 = np.array([])
+        for i_tp in range(n_tp_loop):
+            curr_neuron = activity[mu, :]
+            tmp = np.sign(curr_neuron[tp_split_arr[i_tp]:tp_split_arr[i_tp + 1]] - bimodality)  # +1 or -1, as bimodality is around 0
+            tmp_inds = np.where(tmp[1:] - tmp[:-1])[0] # where non zero? = state change
+            tmp_duration_1 = (tmp_inds[1::2] - tmp_inds[:-1:2]) / freq  # skip 1 to only get 1 state type.
+            tmp_duration_2 = (tmp_inds[2::2] - tmp_inds[1:-1:2]) / freq # get the other type
+            duration_1 = np.concatenate((duration_1, tmp_duration_1))
+            duration_2 = np.concatenate((duration_2, tmp_duration_2))
 
         # if tmp[0] == 1: # start with spike
         #     burst_duration = duration_2
         # elif tmp[0] == -1:  # start with rest
         #     burst_duration = duration_1
 
-        if len(duration_1) == 1 and len(duration_2) == 0:
-            median_activity_period[mu, :] = duration_1[0]
-        elif len(duration_1) == 0 and len(duration_2) == 0:
+        # if len(duration_1) == 1 and len(duration_2) == 0:
+        #     median_activity_period[mu, :] = duration_1[0]
+        if len(duration_1) == 0 or len(duration_2) == 0:
             median_activity_period[mu, :] = 0
         else:
             median_activity_period[mu, 0] = np.maximum(np.median(duration_1), np.median(duration_2))
             median_activity_period[mu, 1] = np.minimum(np.median(duration_1), np.median(duration_2))
-            assert np.abs(len(duration_1) - len(duration_2)) <= 1  # at most 1 rest or spike period more
-            if len(duration_2) == len(duration_1) - 1:  # if 1 rest period more, discard firs t
-                duration_1 = duration_1[1:]
-            median_activity_period[mu, 2] = np.median(duration_1 + duration_2)
+            assert np.abs(len(duration_1) - len(duration_2)) <= len(tp_split_arr) - 1, f'{len(duration_1), len(duration_2)}'  # at most (1 + number of tp splits) rest or spike period more +
+            # if len(duration_2) == len(duration_1) - 1:  # if 1 rest period more, discard firs t
+            #     duration_1 = duration_1[1:]
+            if len(duration_2) > len(duration_1):
+                duration_2 = duration_2[:len(duration_1)]
+            elif len(duration_1) > len(duration_2):
+                duration_1 = duration_1[:len(duration_2)]
+            if len(duration_1) == 0 or len(duration_2) == 0:  # check again becuase of cutting in pre vlines
+                median_activity_period[mu, :] = 0
+            else:
+                median_activity_period[mu, 2] = np.median(duration_1 + duration_2)
         if np.isnan(median_activity_period[mu, 0]):
             print('ERROR: NaN found - BREAKING')
+            print(duration_1, duration_2)
             return
         # if mu == 5:
         #     return
@@ -413,7 +436,8 @@ def get_burst_and_silence_times(sequence):
     assert np.abs(len(list_silence_durations) - len(list_burst_durations)) <= 1
     return list_silence_durations, list_burst_durations, list_period_durations
 
-def compute_median_discretised_state_occupancy(activity_mat, frequency=1, margin=0.4, verbose=1):
+def compute_median_discretised_state_occupancy(activity_mat, frequency=1, margin=0.4,
+                                               tp_split_arr=np.array([], dtype='int'), verbose=1):
     '''Compute state occupancy stats by discretising first'''
 
     n_hu = activity_mat.shape[0]
@@ -423,18 +447,39 @@ def compute_median_discretised_state_occupancy(activity_mat, frequency=1, margin
     median_burst_duration = np.zeros(n_hu)
     median_period_duration = np.zeros(n_hu)
     count_bursts = np.zeros(n_hu)
+    if len(tp_split_arr) > 0 and verbose > 0:
+        print('Splitting at time points', tp_split_arr)
+    if type(tp_split_arr) is not np.array:
+        tp_split_arr = np.array(tp_split_arr)
 
+    assert tp_split_arr.ndim == 1
+    tp_split_arr = np.concatenate((tp_split_arr, np.array([activity_mat.shape[1]], dtype='int'))) # end
+    tp_split_arr = np.concatenate((np.array([0], dtype='int'), tp_split_arr))  # beginning
+    n_tp_loop = len(tp_split_arr) - 1
     for mu in range(0, n_hu):
-        discrete_h = discretize(activity_mat[mu, :], margin=margin, plot=False)  # discretised signal to {0, 1, 2}
-        if verbose > 1:
-            print('Unit %s, P(h=-1)=%.3f,P(h=0)=%.3f,P(h=+1)=%.3f'% (
-                mu,
-                (discrete_h==0).mean(),
-                (discrete_h==1).mean(),
-                (discrete_h==2).mean()  )
-                 )  # print average occupancy rates of the 3 states
+        list_silence_durations, list_burst_durations, list_period_durations = [], [], []
+        curr_h_act = activity_mat[mu, :]
+        for i_tp in range(n_tp_loop):  # loop through discontinuous segments, determine periods separately and combine later
+            curr_h_act_excerpt = curr_h_act[tp_split_arr[i_tp]:tp_split_arr[i_tp + 1]]
+            discrete_h = discretize(curr_h_act_excerpt, margin=margin, plot=False)  # discretised signal to {0, 1, 2}
+            if mu == 0 and verbose == 2:
+                print(curr_h_act_excerpt.shape)
+                print(list_silence_durations)
+            if verbose > 1:
+                print('Unit %s, P(h=-1)=%.3f,P(h=0)=%.3f,P(h=+1)=%.3f'% (
+                    mu,
+                    (discrete_h==0).mean(),
+                    (discrete_h==1).mean(),
+                    (discrete_h==2).mean()  )
+                     )  # print average occupancy rates of the 3 states
 
-        list_silence_durations, list_burst_durations, list_period_durations = get_burst_and_silence_times(discrete_h)
+            tmp_dur, tmp_bur, tmp_per = get_burst_and_silence_times(discrete_h)
+            list_silence_durations += tmp_dur
+            list_burst_durations += tmp_bur
+            list_period_durations += tmp_per
+        if mu == 0 and verbose == 2:
+            print(curr_h_act_excerpt.shape)
+            print(list_silence_durations)
         median_silence_duration[mu] = np.median(list_silence_durations / frequency)
         median_burst_duration[mu] = np.mean(list_burst_durations / frequency)
         median_period_duration[mu] = np.median(list_period_durations / frequency)
