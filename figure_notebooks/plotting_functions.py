@@ -730,7 +730,8 @@ def plot_zero_vs_nz_connectivity(ax_pdf, ax_cdf, funct_mat, struct_mat,
                                  colour_nz='#00b188', colour_zero='#00392c', method='RBM',
                                  funct_nz={}, funct_zero={}, pdf_nz={}, pdf_zero={},
                                  cdf_nz={}, cdf_zero={}, verbose=1, use_triangle=True,
-                                 draw_pval=True):
+                                 draw_pval=True, plot_evidence=True, same_gaussian_std=True,
+                                 plot_nz_zero_log=False):
     if use_triangle:
         triangle_mat = np.zeros_like(struct_mat)
         tri_inds = np.triu_indices_from(triangle_mat, k=0)
@@ -760,34 +761,91 @@ def plot_zero_vs_nz_connectivity(ax_pdf, ax_cdf, funct_mat, struct_mat,
     pdf_nz[method], plot_bins = np.histogram(funct_nz[method], bins=plot_bins, density=True)
     pdf_zero[method], plot_bins = np.histogram(funct_zero[method], bins=plot_bins, density=True)
 
-    cdf_nz[method] = np.cumsum(pdf_nz[method]) / np.max(np.cumsum(pdf_nz[method]))
-    cdf_zero[method] = np.cumsum(pdf_zero[method]) / np.max(np.cumsum(pdf_zero[method]))
+    if plot_evidence is False:
+        cdf_nz[method] = np.cumsum(pdf_nz[method]) / np.max(np.cumsum(pdf_nz[method]))
+        cdf_zero[method] = np.cumsum(pdf_zero[method]) / np.max(np.cumsum(pdf_zero[method]))
 
     plot_bins_centered = (plot_bins[1:] + plot_bins[:-1]) / 2
 
-    distance = (plot_bins_centered[int(np.argmin(np.abs(cdf_zero[method] - 0.5)))] -
-                plot_bins_centered[int(np.argmin(np.abs(cdf_nz[method] - 0.5)))])
-    width_zero = (plot_bins_centered[int(np.argmin(np.abs(cdf_zero[method] - 0.75)))] -
-                  plot_bins_centered[int(np.argmin(np.abs(cdf_zero[method] - 0.25)))])
-    width_nz = (plot_bins_centered[int(np.argmin(np.abs(cdf_nz[method] - 0.75)))] -
-                  plot_bins_centered[int(np.argmin(np.abs(cdf_nz[method] - 0.25)))])
-    print(method, distance / (0.5 * (width_nz + width_zero)))
+    # distance = (plot_bins_centered[int(np.argmin(np.abs(cdf_zero[method] - 0.5)))] -
+    #             plot_bins_centered[int(np.argmin(np.abs(cdf_nz[method] - 0.5)))])
+    # width_zero = (plot_bins_centered[int(np.argmin(np.abs(cdf_zero[method] - 0.75)))] -
+    #               plot_bins_centered[int(np.argmin(np.abs(cdf_zero[method] - 0.25)))])
+    # width_nz = (plot_bins_centered[int(np.argmin(np.abs(cdf_nz[method] - 0.75)))] -
+    #               plot_bins_centered[int(np.argmin(np.abs(cdf_nz[method] - 0.25)))])
+    # print(method, distance / (0.5 * (width_nz + width_zero)))
+
+
+
 
     ax_pdf.plot(plot_bins_centered, pdf_nz[method],
-                       label='Non-zero', c=colour_nz)
+                       label='Non-zero struct.', c=colour_nz)
     ax_pdf.plot(plot_bins_centered, pdf_zero[method],
-                       label='Zero', c=colour_zero)
+                       label='Zero struct.', c=colour_zero)
 
-    ax_cdf.plot(plot_bins_centered,
-                       cdf_nz[method],
-                       label='Non-zero', c=colour_nz)
-    ax_cdf.plot(plot_bins_centered,
-                       cdf_zero[method],
-                       label='Zero', c=colour_zero)
+    if plot_evidence:
+        popt_nz, _ = af.fit_gaussian(plot_bins_centered, pdf_nz[method])
+        popt_zero, _ = af.fit_gaussian(plot_bins_centered, pdf_zero[method])
+
+        if same_gaussian_std:
+            mean_scale = (popt_zero[0] + popt_nz[0]) / 2
+            mean_std = (popt_zero[2] + popt_nz[2]) / 2
+            popt_zero[0], popt_nz[0] = mean_scale, mean_scale
+            popt_zero[2], popt_nz[2] = mean_std, mean_std
+
+        ax_pdf.plot(plot_bins_centered, af.gaus(plot_bins_centered, *popt_nz),
+                     linestyle=':', c=colour_nz, zorder=1, linewidth=2)
+        ax_pdf.plot(plot_bins_centered, af.gaus(plot_bins_centered, *popt_zero),
+                  linestyle=':', c=colour_zero, zorder=1, linewidth=2)
+
+
+        evidence_zero = af.gaus(plot_bins_centered, *popt_zero) / af.gaus(plot_bins_centered, *popt_nz)
+        evidence_nz = af.gaus(plot_bins_centered, *popt_nz) / af.gaus(plot_bins_centered, *popt_zero)
+        # evidence_zero = pdf_zero[method] / pdf_nz[method]
+        # evidence_nz = pdf_nz[method] /pdf_zero[method]
+        # print(popt_zero, popt_nz)
+        # ax_cdf.plot([-6, 0], [20, 20], c='grey')
+        ax_cdf.plot(plot_bins_centered, np.clip(evidence_zero, a_min=0, a_max=20),
+                    c=colour_zero, linestyle=':', linewidth=2)
+        ax_cdf.plot(plot_bins_centered, np.clip(evidence_nz, a_min=0, a_max=20),
+                    c=colour_nz, linestyle=':', linewidth=2)
+        if same_gaussian_std:
+            ## ASSUME MONOTONIC:
+            p_val = 0.05
+            signif_zero = np.where(evidence_nz <= p_val)[0]
+            signif_nz = np.where(evidence_zero <= p_val)[0]
+            if len(signif_zero) > 0:
+                p_low_range_upper_bound = plot_bins_centered[np.max(signif_zero)]
+                # ax_cdf.axvspan(xmin=plot_bins_centered[0], xmax=p_low_range_upper_bound,
+                #                alpha=0.2, facecolor=colour_zero)
+
+            if len(signif_nz) > 0:
+                p_high_range_lower_bound = plot_bins_centered[np.min(signif_nz)]
+                # ax_cdf.axvspan(xmin=p_high_range_lower_bound, xmax=plot_bins_centered[-1],
+                #                alpha=0.2, facecolor=colour_nz)
+        if plot_nz_zero_log:
+            ax_cdf.set_ylim([0.0005, 500])
+            ax_cdf.set_yscale('log')
+            ax_cdf.set_yticks([0.1, 10])
+            ax_cdf.set_ylabel('Log evidence');
+        else:
+            ax_cdf.set_yticks([0, 10, 20])
+            ax_cdf.set_yticklabels(['0', '10', '>20'])
+            ax_cdf.set_ylim([-1, 21])
+            ax_cdf.set_ylabel('Evidence');
+        # ax_cdf.text(s='P < 0.05', x=plot_bins_centered[0], y=150)
+        # ax_cdf.text(s='P < 0.05', x=plot_bins_centered[-1], y=150)
+    else:
+            ax_cdf.plot(plot_bins_centered,
+                               cdf_nz[method],
+                               label='Non-zero', c=colour_nz)
+            ax_cdf.plot(plot_bins_centered,
+                               cdf_zero[method],
+                               label='Zero', c=colour_zero)
     if draw_pval:
         ax_cdf.text(s=f'P < 10^{sci_exp_ceil}', x=plot_bins_centered[int(np.argmin(np.abs(cdf_zero[method] - 0.5)))] - 0.2, y=0.5,
                            fontdict={'ha': 'right'})
-    ax_pdf.set_title(f'{dr_names[method]}', fontdict={'weight': 'bold'})
+    ax_pdf.set_title(f'{dr_names[method]} functional connectivity distributions', fontdict={'weight': 'bold'}, y=1.15)
     ax_cdf.set_xlabel('Functional connection\n(10-log scale)')
     ax_pdf.set_xlim([-7, 0])
     ax_cdf.set_xlim([-7, 0])

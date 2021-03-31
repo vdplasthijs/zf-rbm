@@ -699,3 +699,20 @@ def n_cells_all_recordings(all_rbm_dir = '/media/thijs/hooghoudt/RBM_many_fishes
         freq_dict[short_data_name] = rec.sampling_rate
 
     return (n_cells_dict, time_dict, freq_dict)
+
+
+def gaus(x, a, x0, sigma):
+    return a * np.exp(-(x - x0) ** 2 / (2 * sigma ** 2))
+
+def fit_gaussian(x_arr, y_arr, sigma=None):
+    #https://stackoverflow.com/questions/19206332/gaussian-fit-for-python
+    n = len(x_arr)                          #the number of data
+    # mean = sum(x_arr * y_arr) / n                  #note this correction
+    mean = x_arr[np.argmax(y_arr)]
+    if sigma is None:
+        sigma = sum(y_arr * (x_arr - mean) ** 2) / n
+    # sigma = np.std(y_arr)
+    print(mean, sigma)
+    popt, pcov = scipy.optimize.curve_fit(gaus, x_arr, y_arr, p0 = [1, mean, sigma])
+    print(popt)
+    return popt, pcov
