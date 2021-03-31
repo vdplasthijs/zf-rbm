@@ -365,7 +365,7 @@ def create_mapping_kunstea_order(current_regions):
         # print( np.where(array_order == dict_long_to_short[reg]), dict_long_to_short[reg])
         new_inds[i_reg] = int(np.where(array_order == dict_long_to_short[reg])[0][0])
     new_inds = new_inds.astype('int')
-    return new_inds, array_order
+    return new_inds, array_order, dict_short_to_long
 
 def discretize(h, margin=0.25, plot=False, ax=None):
     '''discretize 1 HU into 3 intervals: mode 1 - no mans land - mode 2.

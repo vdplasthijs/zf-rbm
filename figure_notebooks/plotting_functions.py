@@ -564,9 +564,9 @@ def plot_connectivity_matrix(matrix, region_names, size=15, subset=range(72),
     if reverse_x:
         ax.invert_xaxis()
     if return_fig:
-        return fig
+        return fig, region_names_use
     else:
-        return ax
+        return ax, region_names_use
 
 def plot_distr(mat, min_th=1e-8):
     fig = plt.figure(figsize=[12, 5])
@@ -643,8 +643,8 @@ def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None,
     ax.set_xscale('log')
     ax.scatter(struct_mat, funct_mat, color=color_dots, s=10)
     # sns.jointplot(struct_mat, funct_mat, ax=ax)
-    ax.set_xlabel('Structural connectivity\n(10-log scale)')
-    ax.set_ylabel('Functional connectivity\n(10-log scale)')
+    ax.set_xlabel('Structural connectivity') #\n(10-log scale)')
+    ax.set_ylabel('Functional connectivity')# \n(10-log scale)')
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
 
@@ -832,7 +832,7 @@ def plot_zero_vs_nz_connectivity(ax_pdf, ax_cdf, funct_mat, struct_mat,
             ax_cdf.set_yticks([0, 10, 20])
             ax_cdf.set_yticklabels(['0', '10', '>20'])
             ax_cdf.set_ylim([-1, 21])
-            ax_cdf.set_ylabel('Evidence');
+            ax_cdf.set_ylabel('Ratio distributions');
         # ax_cdf.text(s='P < 0.05', x=plot_bins_centered[0], y=150)
         # ax_cdf.text(s='P < 0.05', x=plot_bins_centered[-1], y=150)
     else:
@@ -846,7 +846,7 @@ def plot_zero_vs_nz_connectivity(ax_pdf, ax_cdf, funct_mat, struct_mat,
         ax_cdf.text(s=f'P < 10^{sci_exp_ceil}', x=plot_bins_centered[int(np.argmin(np.abs(cdf_zero[method] - 0.5)))] - 0.2, y=0.5,
                            fontdict={'ha': 'right'})
     ax_pdf.set_title(f'{dr_names[method]} functional connectivity distributions', fontdict={'weight': 'bold'}, y=1.15)
-    ax_cdf.set_xlabel('Functional connection\n(10-log scale)')
+    ax_cdf.set_xlabel('Functional connectivity\n(10-log scale)')
     ax_pdf.set_xlim([-7, 0])
     ax_cdf.set_xlim([-7, 0])
     for ax in [ax_pdf, ax_cdf]:
