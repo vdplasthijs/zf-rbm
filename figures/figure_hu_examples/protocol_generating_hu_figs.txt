@@ -6,18 +6,60 @@ Open console
 
 self.tidy_up_viewboxes(reverse_x=True, draw_outlines=True, draw_crosses=False, draw_scale=False)
 ## click HU view mode   # this does NOT reverse x 
-## drag out slider between viewboxes just a little bit so that both are fully shown 
+## drag out slider between viewboxes just a little bit so that both are fully shown (see figure_hu_examples/depiction_slider_position.png)
 self.add_scale_bar()  # optional, for first one or something 
-## set view to additive for indiviudals
+self.add_scale_bar(start=[0.05, 0.85, 0.07], end=[0.05, 0.95, 0.07], view=self.view2D)  # for 2D one
+
+## For individuals:
+## set transparency mode to additive 
+
+## For groups:
 self.draw_all_hus_from_path(cluster_dict_file='colours_2021-01-22.pkl')  # for groups
+## To get individual indices (for eg OT), make full fig in Fishualizer, and then plot assemblies 1 by 1 in Fishualizer and find corresponding assembly in inkscape and mark
+---
+
 
 ## HUs are indexed by 'internal index'.
 
 ## To draw region outlines (except for full outlines):
 self.draw_main_region_outlines(main_regions_inds=[82, 86], remove_all_other_regions=True)
+# Or to avoid splitting of region into left and right side:
+self.draw_main_region_outlines(main_regions_inds=[220], remove_all_other_regions=True, split_into_two=False)
 
 ## get back cell selection orb by 
 self.select_3D.show()
 
-# to get curretnly selected clustsers:
+# to get currently selected clustsers:
 [v[0] for v in self.cl_colors.values() if v[2] == 1]
+
+
+
+## Region colors of Rhs:
+{'Rhombencephalon - Rhombomere 1 (N=6703)': ['Rhombencephalon - Rhombomere 1 (N=6703)',
+  '#dc143c',
+  1,
+  0.1],
+ 'Rhombencephalon - Rhombomere 2 (N=3617)': ['Rhombencephalon - Rhombomere 2 (N=3617)',
+  '#7cfc00',
+  1,
+  0.1],
+ 'Rhombencephalon - Rhombomere 3 (N=1801)': ['Rhombencephalon - Rhombomere 3 (N=1801)',
+  '#00008b',
+  1,
+  0.1],
+ 'Rhombencephalon - Rhombomere 4 (N=1523)': ['Rhombencephalon - Rhombomere 4 (N=1523)',
+  '#00ffff',
+  1,
+  0.1],
+ 'Rhombencephalon - Rhombomere 5 (N=1541)': ['Rhombencephalon - Rhombomere 5 (N=1541)',
+  '#ff00ff',
+  1,
+  0.1],
+ 'Rhombencephalon - Rhombomere 6 (N=2808)': ['Rhombencephalon - Rhombomere 6 (N=2808)',
+  '#ffd700',
+  1,
+  0.1],
+ 'Rhombencephalon - Rhombomere 7 (N=6908)': ['Rhombencephalon - Rhombomere 7 (N=6908)',
+  '#a9a9a9',
+  1,
+  0.1]}

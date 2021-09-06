@@ -24,15 +24,15 @@ New individual examples:
 
 dynamic / intrinsic HU index
 
-E: 45/83 ARTR-right => slow antiphasic activity (wrt ARTR left)
+E: 161/83 ARTR-right => slow antiphasic activity (wrt ARTR left)
 regions: 219 (Rh 2)
 
-F: 78/57 ARTR-left => slow antiphasic activity (wrt ARTR right)
+F: 99/57 ARTR-left => slow antiphasic activity (wrt ARTR right)
 regions: 219 (Rh 2)
 
 
 
-G: 43/77 nIII -> saccade circuit? => slow state changes (with ARTR right)
+G: 163/77 nIII -> saccade circuit? => slow state changes (with ARTR right)
 regions: 97 (Oc Mot nIII - Anterior), 238 (VII Facial motor, octavolat. efferent - posterior), 223 (Rh6 - large one), 
 
 H: 157/159 Telencephalon + Hindbrain cluster 
@@ -43,7 +43,7 @@ I: 68/93 Spinal cord ; RS neurons ; two symmetric nice clusters ; purkinje cells
 regions: 250 (Vmat2 Cl 1, smaller middle), 148 (Gad1b Cl 4 - larger, A), 262 (SC Gad1b Str 1 - P), , 131 (Cb Gad1b enrich - A), 155 (Gad1b Str 2 - 2nd P)
 regions maybe: 130 (cb), 258? (X Vagus motor), 232? (S1181t Cl), 219? (Rh 2), 203? (Olig2 enrich Cb)
 
-J: 59/153 nV + Isl1 motor neurons + Spinal cord + nice clusters at midbrain-hindbrain boundary  => related to behaviour?
+J: 112/153 nV + Isl1 motor neurons + Spinal cord + nice clusters at midbrain-hindbrain boundary  => related to behaviour?
 regions: , 212 (Post nV Trigem - bottom of Cb, middle), 130 (Cb - A),  148 (Gad1bn Cl 4, 2nd A, high), 262 (SC Gad1b Str 1 - P), 55 (Gad1b Str 2 - 2nd P)
 regions maybe: 123 (Ant nV Trigem), 265 (Isl1 str), 270 (SC Vglut2, St 2), 224 (Rh 7), 
 

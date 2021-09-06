@@ -1,0 +1,88 @@
+
+
+A) 161/83
+B) 99/57
+C) 163/77
+D) 102/101
+E) 135/110
+F) 95/51
+G) 178/159
+H) 122/153
+I) 177/122
+
+
+Threshold = 0.15
+
+dynamic / intrinsic HU index
+
+Groups:
+TSC: 190/157 (grey), 192/22 (beige), 
+regions: 109 (TSC)
+
+Cb: 141/92 (pink),  140/59 (yellow), 150/152 (indigo)
+regions: 130 (Cb)
+
+OT: 36/1, 60/6, 89/10, 20/17, 125/38, 37/43, 84/64, 16/82, 28/88, 3/108, 66/113, 64/135, 90/160, 7/162, 67/164, 29/168, 15/174, 5/188
+(get list with [int(v[0][-3:]) for v in self.cl_colors.values() if v[2] == 1])
+105 (tectum Str Periventri)
+
+----------------
+
+individual examples:
+
+dynamic / intrinsic HU index
+
+E: 161/83 ARTR-right => slow antiphasic activity (wrt ARTR left)
+regions: 219 (Rh 2)
+
+F: 99/57 ARTR-left => slow antiphasic activity (wrt ARTR right)
+regions: 219 (Rh 2)
+
+H: 178/159 Telencephalon + Hindbrain cluster 
+regions: 246 (Rh Vglut2 Cl 1 - middle), 292 (Te Vglut2 rind - ant) 
+regions maybe: 282? (Pallium), 258 (Rh X vagus - post)
+
+H): 112/153 nV + Isl1 motor neurons + Spinal cord + nice clusters at midbrain-hindbrain boundary  => related to behaviour?
+regions: , 212 (Post nV Trigem - bottom of Cb, middle (called vmat2 in old fig)), 131 (Cb, gad1b enriched - A),  148 (Gad1bn Cl 4, 2nd A, high), 262 (SC Gad1b Str 1 - P), 155 (Gad1b Str 2 - 2nd P)
+regions maybe: 123 (Ant nV Trigem), 130 (Cb), 265 (Isl1 str), 270 (SC Vglut2, St 2), 224 (Rh 7), 
+
+
+G: 163/77 nIII -> saccade circuit? => slow state changes (with ARTR right)
+regions: 96 (nMLF, A), 97 (Oc Mot nIII - Anterior),  223 (Rh6 - large one), 
+maybe: 238 (VII Facial motor, octavolat. efferent - posterior),
+
+98/151:
+same as above
+
+102/101:
+same as above
+
+
+motor tail:
+171/90:
+Rh 2, 4, 6, 7
+
+170/13
+same as above
+
+135/110
+same
+
+92/189
+same
+
+91/178
+same
+
+114/82
+same
+
+117/93
+same
+
+I): 177/122
+282 (Pallium), 175 (IPN), 14 (Hb)
+
+
+
+
