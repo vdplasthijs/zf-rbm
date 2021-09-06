@@ -470,7 +470,7 @@ def plot_one_stat(density, xbins, ybins, title='', ax=None):
 
     ax.set_xlabel(f'Experimental statistics');
     ax.set_ylabel(f'Model statistics')
-    cax.set_ylabel('10-log PDF')
+    cax.set_ylabel(r"$\mathregular{log_{10}}$" + ' PDF')
     ax.set_title(title)
     return ax
 
@@ -569,7 +569,7 @@ def plot_connectivity_matrix(matrix, region_names, size=15, subset=range(72),
             divider = make_axes_locatable(ax)
             cax = divider.append_axes("right", size="2%", pad=0.1)
         plt.colorbar(im, cax=cax)  # https://stackoverflow.com/questions/46314646/change-matplotlib-colorbar-to-custom-height
-        cax.set_ylabel('region to region connectivity strength\n(10-log scale)')
+        cax.set_ylabel('Region-to-region connectivity strength\n(' + r"$\mathregular{log_{10}}$" + ' scale)')
     if reverse_x:
         ax.invert_xaxis()
     if return_fig:
@@ -652,8 +652,8 @@ def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None,
     ax.set_xscale('log')
     ax.scatter(struct_mat, funct_mat, color=color_dots, s=10)
     # sns.jointplot(struct_mat, funct_mat, ax=ax)
-    ax.set_xlabel('Structural connectivity') #\n(10-log scale)')
-    ax.set_ylabel('Functional connectivity')# \n(10-log scale)')
+    ax.set_xlabel('Structural connectivity')
+    ax.set_ylabel('Functional connectivity')
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
 
@@ -709,8 +709,8 @@ def plot_multi_fish_connectivity_scatter(all_connections_tensor, fish_combinatio
     ax.plot([lim_min, lim_max], [lim_min, lim_max], c='grey', alpha=0.5, linestyle=':')
     ax.scatter(plot_dens_1[random_inds], plot_dens_2[random_inds], c=plot_colours[random_inds],
                 alpha=0.8, s=12)
-    ax.set_xlabel('Region to region connectivity\n in Fish A (10-log scale)');
-    ax.set_ylabel('Region to region connectivity\n in Fish B (10-log scale)');
+    ax.set_xlabel('Region-to-region connectivity\n in Fish A (' + r"$\mathregular{log_{10}}$" + ' scale)');
+    ax.set_ylabel('Region-to-region connectivity\n in Fish B (' + r"$\mathregular{log_{10}}$" + ' scale)');
     if axis_lim is not None:
         ax.set_xlim(axis_lim)
         ax.set_ylim(axis_lim)
@@ -855,7 +855,7 @@ def plot_zero_vs_nz_connectivity(ax_pdf, ax_cdf, funct_mat, struct_mat,
         ax_cdf.text(s=f'P < 10^{sci_exp_ceil}', x=plot_bins_centered[int(np.argmin(np.abs(cdf_zero[method] - 0.5)))] - 0.2, y=0.5,
                            fontdict={'ha': 'right'})
     ax_pdf.set_title(f'{dr_names[method]} functional connectivity distributions', fontdict={'weight': 'bold'}, y=1.15)
-    ax_cdf.set_xlabel('Functional connectivity\n(10-log scale)')
+    ax_cdf.set_xlabel('Functional connectivity\n(' + r"$\mathregular{log_{10}}$" + ' scale)')
     ax_pdf.set_xlim([-7, 0])
     ax_cdf.set_xlim([-7, 0])
     for ax in [ax_pdf, ax_cdf]:
