@@ -77,7 +77,7 @@ def plot_example_hu(ax=None, hu_screenshot_folder='/home/thijs/repos/zf-rbm/figu
 
     if ax is None:
         ax = plt.subplot(111)
-    ax.imshow(image[:, y_min:y_max, :])
+    ax.imshow(image[:, y_min:y_max, :], interpolation='none')
     ax.text(s='Ro', x=25, y=71, c='white', fontdict={'size': fontsize})
     ax.text(s='C', x=145, y=71, c='white', fontdict={'size': fontsize})
     ax.text(s='R', x=95, y=1, c='white', fontdict={'size': fontsize, 'va': 'top'})
@@ -260,12 +260,13 @@ def plot_degree_distr(degree_dict, degree_dict_sh, ax=None, dr='rbm', plot_shuff
 
     max_degree = degree_dict[dr].max()
     max_degree_sh = degree_dict_sh[dr].max()
-    if cutoff > max_degree:
-        cutoff = max_degree
-        print(f'cut off decreased to max degree {max_degree}')
-    if cutoff > max_degree_sh:
-        cutoff = max_degree_sh
-        print(f'cut off decreased to max degree shuffled {max_degree_sh}')
+    # if cutoff > max_degree:
+    #     cutoff = max_degree
+    #     cutoff = 10
+    #     print(f'cut off decreased to max degree {max_degree}')
+    # if cutoff > max_degree_sh:
+    #     cutoff = max_degree_sh
+    #     print(f'cut off decreased to max degree shuffled {max_degree_sh}')
 
     degree_values = np.arange(cutoff + 1)
     degree_values_sh = np.arange(cutoff + 1)
@@ -273,10 +274,17 @@ def plot_degree_distr(degree_dict, degree_dict_sh, ax=None, dr='rbm', plot_shuff
     tmp_bar_heights_sh = np.array([np.sum(degree_dict_sh[dr] == d) for d in range(max_degree_sh + 1)])
     bar_heights = np.zeros_like(degree_values)
     bar_heights_sh = np.zeros_like(degree_values_sh)
-    bar_heights[:cutoff] = tmp_bar_heights[:cutoff]
-    bar_heights_sh[:cutoff] = tmp_bar_heights_sh[:cutoff]
-    bar_heights[cutoff] = np.sum(tmp_bar_heights[cutoff:])
-    bar_heights_sh[cutoff] = np.sum(tmp_bar_heights_sh[cutoff:])
+    # print(len(bar_heights), len(tmp_bar_heights), cutoff)
+    if len(tmp_bar_heights) > cutoff:
+        bar_heights[:cutoff] = tmp_bar_heights[:cutoff]
+        bar_heights[cutoff] = np.sum(tmp_bar_heights[cutoff:])
+    else:
+        bar_heights[:len(tmp_bar_heights)] = tmp_bar_heights
+    if len(tmp_bar_heights_sh) > cutoff:
+        bar_heights_sh[:cutoff] = tmp_bar_heights_sh[:cutoff]
+        bar_heights_sh[cutoff] = np.sum(tmp_bar_heights_sh[cutoff:])
+    else:
+        bar_heights_sh[:len(tmp_bar_heights_sh)] = tmp_bar_heights_sh
 
     assert np.sum(bar_heights) == np.sum(tmp_bar_heights)
     if normalise:
@@ -285,14 +293,14 @@ def plot_degree_distr(degree_dict, degree_dict_sh, ax=None, dr='rbm', plot_shuff
     if bar_width is None:
         if plot_shuffled:
             bar_width = 0.4
-            x_degrees = degree_values - bar_width / 2
+            x_degrees = degree_values + bar_width / 2
         else:
             bar_width = 0.8
             x_degrees = degree_values
     ax.bar(x=x_degrees, height=bar_heights, width=bar_width, color=colour,
            label=label)
     if plot_shuffled:
-        ax.bar(x=degree_values_sh + bar_width / 2, height=bar_heights_sh,
+        ax.bar(x=degree_values_sh - bar_width / 2, height=bar_heights_sh,
                width=bar_width, color=colour, alpha=0.4,
                label=label_sh)
 
@@ -446,7 +454,8 @@ def plot_one_stat(density, xbins, ybins, title='', ax=None):
     image = ax.imshow(np.log10(density),
 #                              interpolation='nearest', # do not use. (needed for high number of data points, but messes up pdf)
                                 cmap='mako', origin='low', #vmin=-20, vmax=0,
-               extent=[xbins[0], xbins[-1], ybins[0], ybins[-1]], aspect='auto')
+               extent=[xbins[0], xbins[-1], ybins[0], ybins[-1]], aspect='auto',
+               interpolation='nearest')
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.1)
     plt.colorbar(image, cax=cax)  # https://stackoverflow.com/questions/46314646/change-matplotlib-colorbar-to-custom-height
@@ -540,7 +549,7 @@ def plot_connectivity_matrix(matrix, region_names, size=15, subset=range(72),
         # cmap_matrix = sns.cubehelix_palette(start=0.25, rot=-1, dark=0.25, light=1, reverse=True, as_cmap=True, n_colors=10)  # used in sparsity fig
     else:
         cmap_matrix = cmap
-    im = ax.imshow(matrix_use, vmin=mini, vmax=maxi, cmap=cmap_matrix)
+    im = ax.imshow(matrix_use, vmin=mini, vmax=maxi, cmap=cmap_matrix, interpolation='none')
     if plot_labels:
         ax.set_xticks(range(len(subset)))
         ax.set_xticklabels(region_names_use, rotation=90, fontsize=6)

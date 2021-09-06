@@ -624,6 +624,7 @@ def get_all_prs_rbms(all_rbm_dir = '/media/thijs/hooghoudt/RBM_many_fishes_used_
     n_rbms = len(all_rbm_list)
     pr_dict = {}
     data_name_dict = {k: [x for x in os.listdir(k) if x[-3:] == '.h5'] for k in all_data_dir_list}
+    n_time_frames = {}
     # print(data_name_dict)
     for i_rbm, rbm_name in enumerate(all_rbm_list):  # rbm names, see if they match with data names
         print(f'{i_rbm}/{len(all_rbm_list)}')
@@ -643,13 +644,14 @@ def get_all_prs_rbms(all_rbm_dir = '/media/thijs/hooghoudt/RBM_many_fishes_used_
             return
         vu_data = get_neural_data(dir_path=current_data_dir_path,
                                   file_path=current_data_file_path)
+        n_time_frames[current_data_file_path] = vu_data.shape
         hu_data = get_demeaned_hu_dynamics_from_rbm_file(vu_data=vu_data,
                                                          rbm_path=os.path.join(all_rbm_dir, rbm_name),
                                                          demean_or_depeak=demean_or_depeak)
         pr_hus = part_ratio_hu_activity(hu_activity=hu_data, set_zero=bool_set_zero)
         pr_dict[rbm_name[:-5]] = pr_hus.copy()
         vu_data, hu_data = None, None
-    return pr_dict
+    return pr_dict#, n_time_frames
 
 def n_cells_all_recordings(all_rbm_dir = '/media/thijs/hooghoudt/RBM_many_fishes_used_for_connectivity',
                      all_data_dir_list=['/media/thijs/hooghoudt/Zebrafish_data/spontaneous_data_guillaume',
