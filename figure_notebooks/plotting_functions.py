@@ -94,6 +94,55 @@ def plot_example_hu(ax=None, hu_screenshot_folder='/home/thijs/repos/zf-rbm/figu
 
     return ax
 
+def plot_hu_video(ax=None, hu_screenshot_folder='/home/thijs/repos/zf-rbm/figures/supp_fig_all_hus/fishualizer_screenshots',
+                    save_folder='/home/thijs/repos/zf-rbm/figures/supp_fig_all_hus/python_tidy',
+                    hu_id=86, id_reference='internal',
+                    filename_prefix='screenshot_hu_', y_min=400, y_max=1700,
+                    fontsize=16, hu_sorting=None, plot_cbar=True,
+                    save_fig=False, plot_fig=True):
+    '''fontsize: 15 for (10, 10) fig, linearly scaling seems fine '''
+    assert id_reference == 'internal' or id_reference == 'raster'  # does the ID refer to internal index or (dynamic) raster plot index?
+    if id_reference == 'internal':
+        save_id = hu_id
+        load_id = hu_id
+    elif id_reference == 'raster':
+        assert hu_sorting is not None
+        hu_sorting_reverse = np.zeros_like(hu_sorting)  # reverse order to find corresponding names
+        for i_map, map in enumerate(hu_sorting):
+            hu_sorting_reverse[map] = i_map
+        save_id = hu_sorting_reverse[hu_id]
+        load_id = hu_id
+    # screenshot_files = os.listdir(hu_screenshot_folder)
+    filename = filename_prefix + str(load_id).zfill(3) + '.png'
+    image = mpimg.imread(os.path.join(hu_screenshot_folder, filename))
+    image = image[:, y_min:y_max, :]
+
+    if plot_cbar:
+        image_cbar = mpimg.imread(os.path.join(hu_screenshot_folder, 'screenshot_colorbar.png'))
+        image_cbar = image_cbar[79:378, :, :][:, 4:32, :]
+
+        image[272:591, :, :][:, 1226:1274, :] = (200, 200, 200, 255)
+        image[282:581, :, :][:, 1236:1264, :] = image_cbar
+    if ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=(8, 6))
+    ax.imshow(image, interpolation='none')
+    ax.text(s='Assembly #' + str(save_id), x=858, y=40, c='white', fontdict={'size': fontsize})
+    ax.text(s='0.1 mm', x=858, y=820, c='white', fontdict={'size': fontsize})
+    if plot_cbar:
+        ax.text(s='-0.3'.replace("-", u"\u2212"), x=1250, y=635,
+                c='white', fontdict={'size': fontsize}, ha='center')
+        ax.text(s='0.3'.replace("-", u"\u2212"), x=1250, y=258,
+                c='white', fontdict={'size': fontsize}, ha='center')
+    ax.axis('off')
+    if save_fig:
+        plt.savefig(os.path.join(save_folder, 'tidy_hu_' + str(save_id).zfill(3)), dpi=600, bbox_inches='tight')
+    if plot_fig is False:
+        plt.close(fig)
+    return ax
+
+
+
+
 def break_word(word, break_size=25):
     '''Function that tries to  break up word at first space after given break_size'''
     if len(word) > break_size:

@@ -33,6 +33,8 @@ self.select_3D.show()
 [v[0] for v in self.cl_colors.values() if v[2] == 1]
 
 
+## save all:
+self.save_all_static_datasets(foldername='/home/thijs/repos/zf-rbm/figures/supp_fig_all_hus/fishualizer_screenshots')
 
 ## Region colors of Rhs:
 {'Rhombencephalon - Rhombomere 1 (N=6703)': ['Rhombencephalon - Rhombomere 1 (N=6703)',
