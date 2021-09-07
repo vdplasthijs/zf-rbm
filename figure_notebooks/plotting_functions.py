@@ -96,7 +96,8 @@ def plot_example_hu(ax=None, hu_screenshot_folder='/home/thijs/repos/zf-rbm/figu
 
 def plot_hu_video(ax=None, hu_screenshot_folder='/home/thijs/repos/zf-rbm/figures/supp_fig_all_hus/fishualizer_screenshots',
                     save_folder='/home/thijs/repos/zf-rbm/figures/supp_fig_all_hus/python_tidy',
-                    hu_id=86, id_reference='internal',
+                    hu_id=86, id_reference='internal', hu_activity_sorted=None, freq=None,
+                    test_inds=None,
                     filename_prefix='screenshot_hu_', y_min=400, y_max=1700,
                     fontsize=16, hu_sorting=None, plot_cbar=True,
                     save_fig=False, plot_fig=True):
@@ -124,24 +125,73 @@ def plot_hu_video(ax=None, hu_screenshot_folder='/home/thijs/repos/zf-rbm/figure
         image[272:591, :, :][:, 1226:1274, :] = (200, 200, 200, 255)
         image[282:581, :, :][:, 1236:1264, :] = image_cbar
     if ax is None:
-        fig, ax = plt.subplots(1, 1, figsize=(8, 6))
-    ax.imshow(image, interpolation='none')
-    ax.text(s='Assembly #' + str(save_id), x=858, y=40, c='white', fontdict={'size': fontsize})
-    ax.text(s='0.1 mm', x=858, y=820, c='white', fontdict={'size': fontsize})
+        # fig, ax = plt.subplots(1, 1, figsize=(8, 6))
+        fig = plt.figure(constrained_layout=False, figsize=(8, 7))
+        gs_im = fig.add_gridspec(ncols=1, nrows=1, bottom=0.25, top=0.95,
+                                 hspace=0, wspace=0, left=0.05, right=0.95)  # [1, 2.2, 1.2]
+        gs_act = fig.add_gridspec(ncols=1, nrows=1, bottom=0.05, top=0.2,
+                                 hspace=0, wspace=0, left=0.1, right=0.95)
+        ax_im = fig.add_subplot(gs_im[0])
+        ax_act = fig.add_subplot(gs_act[0])
+
+    ## Fishualizer image
+    ax_im.imshow(image, interpolation='none')
+    ax_im.text(s='Assembly #' + str(save_id), x=858, y=40, c='white', fontdict={'size': fontsize})
+    ax_im.text(s='0.1 mm', x=858, y=820, c='white', fontdict={'size': fontsize})
     if plot_cbar:
-        ax.text(s='-0.3'.replace("-", u"\u2212"), x=1250, y=635,
+        ax_im.text(s='-0.3'.replace("-", u"\u2212"), x=1250, y=635,
                 c='white', fontdict={'size': fontsize}, ha='center')
-        ax.text(s='0.3'.replace("-", u"\u2212"), x=1250, y=258,
+        ax_im.text(s='0.3'.replace("-", u"\u2212"), x=1250, y=258,
                 c='white', fontdict={'size': fontsize}, ha='center')
-    ax.axis('off')
+    ax_im.axis('off')
+
+    ## plot time trace
+    if hu_activity_sorted is not None:
+        if freq is None:
+            freq = 1
+            print('WARNING: freq set by hand')
+
+        ## prepare dynamics
+        n_extra_tp = 40  # shift becaues of discontinuity in test dat (segs 267)
+        plot_hu_act_mat = np.zeros((hu_activity_sorted.shape[0], hu_activity_sorted.shape[1] + 2 * n_extra_tp))
+        split_tp = int(np.where(np.diff(test_inds) > 1)[0]) + 1
+        plot_hu_act_mat[:, :split_tp] = hu_activity_sorted[:, :split_tp]
+        plot_hu_act_mat[:, split_tp:(split_tp + n_extra_tp)] = np.nan
+        plot_hu_act_mat[:, (split_tp + n_extra_tp):(2 * split_tp + n_extra_tp)] = hu_activity_sorted[:, split_tp:(2 * split_tp)]
+        plot_hu_act_mat[:, (2 * split_tp + n_extra_tp):(2 * split_tp + 2 * n_extra_tp)] = np.nan
+        plot_hu_act_mat[:, (2 * split_tp + 2 * n_extra_tp):] = hu_activity_sorted[:, (2 * split_tp):]
+
+        xticks_activity = np.array([x * int(60 * freq) for x in range(9)])
+        # xticklabels_activity = (np.round(xticks_activity / freq)).astype('int') # starting at 0
+        xticklabels_activity = np.round(test_inds[xticks_activity] / freq).astype('int')  # real time
+        xticks_activity = [x + n_extra_tp if x > split_tp else x for x in xticks_activity]  # shift after discontinuity
+        xticks_activity = [x + n_extra_tp if x > (2 * split_tp) else x for x in xticks_activity]  # shift after 2nd discontinuity
+        xticklabels_activity = xticklabels_activity - xticklabels_activity[0]  # subtract first one to start at 0
+
+        ## plot
+        ax_act.plot(plot_hu_act_mat[save_id, :], c='k', lw=2)
+        ax_act.set_xticks([x * int(60 * freq) for x in range(9)])  # set time in seconds
+        ax_act.set_xticklabels((np.round(ax_act.get_xticks() / freq)).astype('int'))
+        ax_act.set_xlabel('Time of 3 test data blocks (s)'); ax_act.set_ylabel('HU activity (a.u.)')
+        ax_act.spines['top'].set_visible(False)
+        ax_act.spines['right'].set_visible(False)
+        ax_act.set_ylim([-1.2, 3.9])
+        ax_act.set_xticks(xticks_activity)
+        ax_act.set_xticklabels(xticklabels_activity, rotation=0)
+
+        ## Add white panels over discont. to hide x axis
+        for x_add in [0, split_tp + n_extra_tp]:
+            ax_act.axvspan(xmin=split_tp + x_add, xmax=split_tp + n_extra_tp + x_add,
+                            ymin=-0.05, ymax=0.05, clip_on=False,
+                            facecolor='white', zorder=10)
+        for x_add in [10, 20]:
+            ax_act.add_line(matplotlib.lines.Line2D(np.array([split_tp - 5 + x_add, split_tp + 5 + x_add]), np.array([-2, -1]),
+                                                 lw=1, color='k', alpha=1, clip_on=False, zorder=15))
     if save_fig:
         plt.savefig(os.path.join(save_folder, 'tidy_hu_' + str(save_id).zfill(3)), dpi=600, bbox_inches='tight')
     if plot_fig is False:
         plt.close(fig)
     return ax
-
-
-
 
 def break_word(word, break_size=25):
     '''Function that tries to  break up word at first space after given break_size'''

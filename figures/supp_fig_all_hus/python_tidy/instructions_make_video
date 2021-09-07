@@ -3,5 +3,5 @@ To make the video:
 ## navigate to: ~/repos/zf-rbm/figures/supp_fig_all_hus/python_tidy
 
 ## then type in terminal:
-ffmpeg -framerate 1 -start_number 0 -i tidy_hu_%03d.png -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -s 1920x1080 output.mp4
+ffmpeg -framerate 1 -start_number 0 -i tidy_hu_%03d.png -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -s 1920x1080 supp_video_1.mp4
 
