@@ -760,7 +760,7 @@ def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None,
         print(p_val_spearman)
         sci_not = np.format_float_scientific(p_val_spearman, precision=3)
         sci_exp_ceil = int(sci_not.split('e')[1]) + 1
-        ax.set_title(f'{dr_names[key]} vs structural connectivity\n' + r'$\mathregular{r_S}$' + f' = {np.round(spearman, 2)}, P < 10^{sci_exp_ceil}',
+        ax.set_title(f'{dr_names[key]} vs structural connectivity\n' + r'$\mathregular{r_S}$' + f' = {np.round(spearman, 2)}, P < ' + r"$10^{{{tmp}}}$".format(tmp=sci_exp_ceil),
                         fontdict={'weight': 'bold'})
     else:
         ax.set_title(f'Structural vs functional connectivity\nr = {np.round(spearman, 2)}',
