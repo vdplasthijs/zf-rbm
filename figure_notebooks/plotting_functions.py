@@ -691,7 +691,7 @@ def plot_distr(mat, min_th=1e-8):
 def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None,
                          key=None, compute_in_log=False, fill_diag=False,
                          filter_zeros=False, set_limits=True, title='general',
-                         use_one_triangle=True):
+                         use_one_triangle=True, plot_in_log=True):
     if ax is None:
         ax = plt.subplot(111)
     assert struct_mat.shape == funct_mat.shape
@@ -747,12 +747,20 @@ def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None,
         color_dots = dr_colors[key.lower()]
     else:
         color_dots = 'grey'
-    ax.set_yscale('log')
-    ax.set_xscale('log')
-    ax.scatter(struct_mat, funct_mat, color=color_dots, s=10)
-    # sns.jointplot(struct_mat, funct_mat, ax=ax)
-    ax.set_xlabel('Structural connectivity')
-    ax.set_ylabel('Functional connectivity')
+    if plot_in_log:
+        ax.scatter(struct_mat_corr, funct_mat_corr, color=color_dots, s=10)
+        ax.set_xlabel('Structural connectivity' + '\n(' + r"$\mathregular{log_{10}}$" + ' scale)')
+        ax.set_ylabel('Functional connectivity' + '\n(' + r"$\mathregular{log_{10}}$" + ' scale)')
+    else:
+        ax.set_yscale('log')
+        ax.set_xscale('log')
+        ax.scatter(struct_mat, funct_mat, color=color_dots, s=10)
+        ax.set_xlabel('Structural connectivity')
+        ax.set_ylabel('Functional connectivity')
+    
+    
+    
+    
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
 
@@ -760,14 +768,17 @@ def plot_funct_vs_struct(struct_mat, funct_mat, subset=np.arange(72), ax=None,
         print(p_val_spearman)
         sci_not = np.format_float_scientific(p_val_spearman, precision=3)
         sci_exp_ceil = int(sci_not.split('e')[1]) + 1
-        ax.set_title(f'{dr_names[key]} vs structural connectivity\n' + r'$\mathregular{r_S}$' + f' = {np.round(spearman, 2)}, P < 10^{sci_exp_ceil}',
+        ax.set_title(f'{dr_names[key]} vs structural connectivity\n' + r'$\mathregular{r_S}$' + f' = {np.round(spearman, 2)}, P < ' + r"$10^{{{tmp}}}$".format(tmp=sci_exp_ceil),
                         fontdict={'weight': 'bold'})
     else:
         ax.set_title(f'Structural vs functional connectivity\nr = {np.round(spearman, 2)}',
                      fontdict={'weight': 'bold'})
     if set_limits:
-        ax.set_xlim(x_lim)
-        ax.set_ylim(y_lim)
+        if plot_in_log:
+            pass
+        else:
+            ax.set_xlim(x_lim)
+            ax.set_ylim(y_lim)
     return (pearson, spearman)
 
 def plot_multi_fish_connectivity_scatter(all_connections_tensor, fish_combinations=[(0, 1)],
