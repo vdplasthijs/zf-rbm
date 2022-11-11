@@ -3,4 +3,5 @@ figure_notebooks/.ipynb_checkpoints/
 
 .ipynb_checkpoints/
 __pycache__/
-__pycache__/
+
+figure_notebooks/__pycache__/
