@@ -35,10 +35,10 @@ for ii, x in enumerate(plt.rcParams['axes.prop_cycle']()):
 plt.rcParams['axes.prop_cycle'] = cycler(color=sns.color_palette('colorblind'))
 
 
-dr_legend = {'pca': 'PCA', 'rbm': 'cRBM', 'fa': 'FA', 'ica': 'ICA', 'glm': 'GLM'}
-dr_colors = {'glm': '#008B8B', 'pca': '#808000', 'rbm': '#800080', 'fa': 'red', 'ica':'#157bf9'}
+dr_legend = {'pca': 'PCA', 'rbm': 'cRBM', 'fa': 'FA', 'ica': 'ICA', 'glm': 'GLM', 'vae': 'VAE'}
+dr_colors = {'glm': '#008B8B', 'pca': '#808000', 'rbm': '#800080', 'fa': 'red', 'ica':'#157bf9', 'vae': '#037c6e'}
 dr_names = {'rbm': 'cRBM', 'RBM': 'cRBM', 'pca': 'PCA', 'PCA': 'PCA',
-            'covariance': 'covariance', 'correlation': 'correlation'}
+            'covariance': 'covariance', 'correlation': 'correlation', 'vae': 'VAE'}
 def set_fontsize(font_size=12):
     plt.rcParams['font.size'] = font_size
     plt.rcParams['axes.autolimit_mode'] = 'data' # default: 'data'
