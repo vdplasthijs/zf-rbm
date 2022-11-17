@@ -49,6 +49,22 @@ def set_fontsize(font_size=12):
              'ytick.labelsize': font_size}
     plt.rcParams.update(params)
 
+def equal_xy_lims(ax, start_zero=False):
+    '''Set x-axis lims equal to y-axis lims'''
+    xlims = ax.get_xlim()
+    ylims = ax.get_ylim()
+    max_outer_lim = np.maximum(xlims[1], ylims[1])
+    min_inner_lim = np.minimum(xlims[0], ylims[0])
+
+    if start_zero:
+        ax.set_xlim([0, max_outer_lim])
+        ax.set_ylim([0, max_outer_lim])
+    else:
+        ax.set_xlim([min_inner_lim, max_outer_lim])
+        ax.set_ylim([min_inner_lim, max_outer_lim])
+
+    return min_inner_lim, max_outer_lim
+
 def plot_example_hu(ax=None, hu_screenshot_folder='/home/thijs/repos/zf-rbm/figures/HU_screenshots_2020-05-16-0844',
                     hu_id=86, id_reference='internal',
                     filename_prefix='screenshot_hu_', y_min=400, y_max=1600,
