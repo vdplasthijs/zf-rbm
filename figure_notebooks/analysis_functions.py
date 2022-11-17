@@ -718,3 +718,83 @@ def fit_gaussian(x_arr, y_arr, sigma=None):
     popt, pcov = scipy.optimize.curve_fit(gaus, x_arr, y_arr, p0 = [1, mean, sigma])
     print(popt)
     return popt, pcov
+
+def get_assembly_sizes(weight_mat, threshold=0.01, normalise_by_n_neurons=True):
+    assert type(weight_mat) == np.ndarray
+    assert weight_mat.ndim == 2
+    if weight_mat.shape[0] < weight_mat.shape[1]:
+        dim_hus = 1
+    else:
+        dim_hus = 0
+    assembly_sizes = np.sum(np.abs(weight_mat) > threshold, dim_hus)
+    if normalise_by_n_neurons:
+        assembly_sizes = assembly_sizes / weight_mat.shape[1]
+    
+    assert len(assembly_sizes) < 500, 'more HUs than expected'
+    return assembly_sizes
+
+def get_rbm_assembly_sizes(rbm_path='', threshold=0.01, test_data=None, test_inds=None, freq=None):
+
+    tmp_RBM = pickle.load(open(rbm_path, 'rb'))
+    n_hu = tmp_RBM.n_h
+    l1 = tmp_RBM.l1
+    assembly_sizes = get_assembly_sizes(weight_mat=tmp_RBM.weights, threshold=threshold)
+    if test_data is None or test_inds is None or freq is None:
+        time_scales_hu = None
+    else:
+        time_scales_hu = get_timescales(rbm=tmp_RBM, test_data=test_data, test_inds=test_inds, freq=freq)
+    return (n_hu, l1), assembly_sizes, time_scales_hu
+
+def get_all_rbms_assembly_sizes(rbm_path_list, threshold=0.01, test_data=None, test_inds=None, freq=None):
+
+    l1_list, nhu_list, as_list, ts_list = [], [], [], []
+    for i_rbm, rbm_path in tqdm(enumerate(rbm_path_list)):
+        (n_hu, l1), assembly_sizes, time_scales_hu = get_rbm_assembly_sizes(rbm_path=rbm_path, threshold=threshold,
+                                                                            test_data=test_data, test_inds=test_inds, freq=freq)
+        
+        l1_list.append(l1)
+        nhu_list.append(n_hu)
+        as_list.append(assembly_sizes)
+        ts_list.append(time_scales_hu)
+        
+    assert (nhu_list == np.array([len(x) for x in as_list])).all()
+    median_as = [np.median(xx) for xx in as_list]
+    mean_as = [np.mean(xx) for xx in as_list]
+    median_ts = [np.median(xx) for xx in ts_list]
+    mean_ts = [np.mean(xx) for xx in ts_list]
+    df_as = pd.DataFrame({'l1': l1_list, 'nhu': nhu_list, 'assembly_sizes': as_list,
+                          'mean_as': mean_as, 'median_as': median_as,
+                          'time_scales': ts_list,
+                          'mean_ts': mean_ts, 'median_ts': median_ts})
+        
+    return df_as
+
+def rbm_paths_used_for_sweep():
+    df_folder = '/home/thijs/repos/dnp-code/results_df_lookup/'
+    df_names = ['df_lookup__burstsTrue_testtest_2020-06-17__20180912-Run01.h5']
+    df_lookup = pd.concat([pd.read_hdf(df_folder + x) for x in df_names])
+    rbm_names = [x.split('/')[-1] for x in df_lookup['fullpath']]
+
+    new_folders = ['/media/thijs/hooghoudt/new_sweep_april20/RBM_sweep_combined',
+                   '/media/thijs/hooghoudt/new_sweep_april20/RBM_sweep_reruns']
+    dir_contents = {x: os.listdir(x) for x in new_folders}
+    full_paths = []
+    for irbm, rbm_name in enumerate(rbm_names):
+        count_in_folders = 0
+        for dirname, content in dir_contents.items():
+            if rbm_name in content:
+                count_in_folders += 1
+                full_paths.append(os.path.join(dirname, rbm_name))
+        assert count_in_folders == 1, f'{rbm_name} is in {count_in_folders} folders'
+    
+    return full_paths
+
+def get_timescales(rbm, test_data, test_inds, freq):
+    hu_act_test = np.transpose(rbm.mean_hiddens(test_data.T))
+    split_tp = int(np.where(np.diff(test_inds) > 1)[0]) + 1
+    (median_silence_duration, median_burst_duration, median_period_duration, 
+                         count_bursts) = compute_median_discretised_state_occupancy(activity_mat=hu_act_test, 
+                                                               frequency=freq, margin=0.5,
+                                                               tp_split_arr=np.array([split_tp]))
+                                                               
+    return median_period_duration
