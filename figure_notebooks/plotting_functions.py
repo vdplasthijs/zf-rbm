@@ -39,6 +39,21 @@ dr_legend = {'pca': 'PCA', 'rbm': 'cRBM', 'fa': 'FA', 'ica': 'ICA', 'glm': 'GLM'
 dr_colors = {'glm': '#008B8B', 'pca': '#808000', 'rbm': '#800080', 'fa': 'red', 'ica':'#157bf9', 'vae': '#037c6e'}
 dr_names = {'rbm': 'cRBM', 'RBM': 'cRBM', 'pca': 'PCA', 'PCA': 'PCA',
             'covariance': 'covariance', 'correlation': 'correlation', 'vae': 'VAE'}
+
+def despine(ax):
+    '''Remove top and right spine'''
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+def naked(ax):
+    '''Remove all spines, ticks and labels'''
+    for ax_name in ['top', 'bottom', 'right', 'left']:
+        ax.spines[ax_name].set_visible(False)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_xlabel('')
+    ax.set_ylabel('')
+
 def set_fontsize(font_size=12):
     plt.rcParams['font.size'] = font_size
     plt.rcParams['axes.autolimit_mode'] = 'data' # default: 'data'
