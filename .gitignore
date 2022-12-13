@@ -5,3 +5,5 @@ figure_notebooks/.ipynb_checkpoints/
 __pycache__/
 
 figure_notebooks/__pycache__/
+*.pyc
+__pycache__/*.pyc
