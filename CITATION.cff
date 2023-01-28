@@ -1,7 +1,7 @@
 date-released: "2023-jan-01"
 repository-code: "https://github.com/vdplasthijs/zf-rbm"
 message: "If you use this software, please cite it as below."
-doi: "10.7554/eLife.83139
+doi: "10.7554/eLife.83139"
 title: "Neural assemblies uncovered by generative modeling explain whole-brain activity statistics and reflect structural connectivity"
 cff-version: "1.2.0"
 authors:
