@@ -31,6 +31,7 @@ preferred-citation:
   url: "https://doi.org/10.7554/eLife.83139"
   date-released: "2023-jan-01"
   volume: "12"
+  journal: "eLife"
   title: "Neural assemblies uncovered by generative modeling explain whole-brain activity statistics and reflect structural connectivity"
   editor: "Latham, Peter"
   publisher: "eLife Sciences Publications, Ltd"
